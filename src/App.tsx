@@ -495,14 +495,14 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex w-full flex-wrap items-center gap-2 text-sm lg:w-auto lg:justify-end">
+        <div className="grid w-full grid-cols-2 gap-2 text-sm sm:flex sm:flex-wrap lg:w-auto lg:justify-end">
           <StatusPill
             label={mode === "sentraq" ? "Time to containment" : "Time to impact"}
             value={`${timeLeft}s`}
             severity={timeLeft <= 7 ? (mode === "sentraq" ? "low" : "critical") : "medium"}
           />
           <StatusPill label="Alert rate" value={`${rate}/s`} severity="low" />
-          <div className={`px-3 py-2 rounded-md border font-bold ${
+          <div className={`min-h-11 break-words rounded-md border px-4 py-3 font-bold ${
             mode === "sentraq"
               ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
               : "border-amber-500/40 bg-amber-500/10 text-amber-300"
@@ -512,13 +512,13 @@ export default function App() {
           <button
             onClick={() => setRunning((r) => !r)}
             disabled={!hasStarted || attackTriggered}
-            className="px-3 py-2 rounded-md border border-slate-700 bg-slate-900 hover:bg-slate-800 disabled:opacity-50"
+            className="min-h-11 rounded-md border border-slate-700 bg-slate-900 px-4 py-3 hover:bg-slate-800 disabled:opacity-50"
           >
             {running ? "Pause" : "Resume"}
           </button>
           <button
             onClick={() => setSoundMuted((muted) => !muted)}
-            className={`px-3 py-2 rounded-md border font-semibold ${
+            className={`min-h-11 rounded-md border px-4 py-3 font-semibold ${
               soundMuted
                 ? "border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800"
                 : "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
@@ -528,14 +528,14 @@ export default function App() {
           </button>
           <button
             onClick={() => resetSimulation(scenario, mode)}
-            className="px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold"
+            className="min-h-11 rounded-md bg-cyan-600 px-4 py-3 font-semibold text-white hover:bg-cyan-500"
           >
             Restart
           </button>
         </div>
       </header>
 
-      <section className={`mx-3 mt-3 rounded-lg border px-3 py-3 sm:px-4 ${
+      <section className={`mx-4 mt-4 rounded-lg border px-4 py-4 ${
         executionStatus === "contained"
           ? "border-emerald-500/40 bg-emerald-950/20"
           : executionStatus === "completed"
@@ -572,32 +572,31 @@ export default function App() {
             {mode === "sentraq" && sentraqContained && (
               <button
                 onClick={() => setShowReport(true)}
-                className="rounded border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 font-bold text-cyan-300 hover:bg-cyan-500/20"
+                className="min-h-11 rounded border border-cyan-500/40 bg-cyan-500/10 px-4 py-3 font-bold text-cyan-300 hover:bg-cyan-500/20"
               >
                 View report
               </button>
             )}
-            <span className="rounded border border-slate-700 bg-black/30 px-2 py-1 text-slate-300">
+            <span className="max-w-full break-all rounded border border-slate-700 bg-black/30 px-2 py-1 text-slate-300">
               scenario={scenario.id}
             </span>
-            <span className={`rounded border px-2 py-1 ${
+            <span className={`max-w-full break-all rounded border px-2 py-1 ${
               mode === "sentraq"
                 ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
                 : "border-amber-500/40 bg-amber-500/10 text-amber-300"
             }`}>
               mode={mode === "sentraq" ? "with_sentraq" : "without_sentraq"}
             </span>
-            <span className="rounded border border-slate-700 bg-black/30 px-2 py-1 text-slate-300">
+            <span className="max-w-full break-all rounded border border-slate-700 bg-black/30 px-2 py-1 text-slate-300">
               duration=20s
             </span>
           </div>
         </div>
       </section>
 
-      <div className="overflow-x-auto">
-        <div className="grid min-w-[1180px] grid-cols-12 gap-3 p-3 lg:min-h-[calc(100vh-65px)]">
-        <aside className="flex flex-col gap-3 lg:col-span-3 lg:min-h-[720px]">
-          <section className={`border rounded-lg p-3 ${
+      <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-12 md:min-h-[calc(100vh-65px)]">
+        <aside className="flex flex-col gap-3 md:col-span-3 md:min-h-[720px]">
+          <section className={`border rounded-lg p-4 ${
             mode === "sentraq" ? "border-emerald-500/30 bg-emerald-950/10" : "border-amber-500/30 bg-amber-950/10"
           }`}>
             <h2 className={`text-xs uppercase tracking-wider font-bold mb-2 ${
@@ -641,7 +640,7 @@ export default function App() {
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-3 h-[300px]">
+          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 h-[300px]">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold">Attack simulations</h2>
               <span className="text-[11px] text-cyan-300 font-mono">{FEATURED_ATTACK_SCENARIOS.length} ready</span>
@@ -651,7 +650,7 @@ export default function App() {
                 <div
                   key={item.id}
                   onClick={() => selectScenario(item)}
-                  className={`w-full rounded-md border px-2.5 py-2 transition ${
+                  className={`w-full rounded-md border px-4 py-4 transition ${
                     item.id === scenario.id
                       ? "border-cyan-500/60 bg-cyan-500/10"
                       : "border-slate-800 bg-slate-900 hover:border-slate-600"
@@ -662,13 +661,13 @@ export default function App() {
                       <div className="text-sm font-bold text-white truncate">{item.shortName}</div>
                       <p className="mt-0.5 text-[11px] leading-snug text-slate-400 line-clamp-2">{item.summary}</p>
                     </div>
-                    <div className="flex shrink-0 flex-row gap-1.5 sm:w-28 sm:flex-col">
+                    <div className="flex w-full shrink-0 flex-col gap-2 sm:w-28">
                       <button
                         onClick={(event) => {
                           event.stopPropagation();
                           resetSimulation(item, "manual");
                         }}
-                        className="flex-1 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-[10px] font-bold text-amber-300 hover:bg-amber-500/20"
+                        className="min-h-11 w-full rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-3 text-[12px] font-bold text-amber-300 hover:bg-amber-500/20"
                       >
                         Execute without Sentraq
                       </button>
@@ -677,7 +676,7 @@ export default function App() {
                           event.stopPropagation();
                           resetSimulation(item, "sentraq");
                         }}
-                        className="flex-1 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-[10px] font-bold text-emerald-300 hover:bg-emerald-500/20"
+                        className="min-h-11 w-full rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-3 text-[12px] font-bold text-emerald-300 hover:bg-emerald-500/20"
                       >
                         Execute with Sentraq
                       </button>
@@ -688,7 +687,7 @@ export default function App() {
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-3 h-[220px]">
+          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 h-[220px]">
             <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">Attack automation log</h2>
             <div className="h-full min-h-0 overflow-y-auto rounded-md bg-black/60 border border-slate-800 p-2 font-mono text-xs">
               {!hasStarted ? (
@@ -708,9 +707,9 @@ export default function App() {
           </section>
         </aside>
 
-        <main className="flex flex-col gap-3 lg:col-span-6 lg:min-h-[720px]">
+        <main className="flex flex-col gap-3 md:col-span-6 md:min-h-[720px]">
           {mode === "sentraq" && sentraqContained && (
-            <section className="rounded-lg border border-emerald-500/50 bg-emerald-950/30 px-4 py-3 shadow-lg shadow-emerald-950/30">
+            <section className="rounded-lg border border-emerald-500/50 bg-emerald-950/30 px-4 py-4 shadow-lg shadow-emerald-950/30">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-sm font-black uppercase tracking-wider text-emerald-300">
@@ -722,7 +721,7 @@ export default function App() {
                 </div>
                 <button
                   onClick={() => setShowReport(true)}
-                  className="w-full shrink-0 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 sm:w-auto"
+                  className="min-h-11 w-full shrink-0 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-4 py-3 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 sm:w-auto"
                 >
                   View report
                 </button>
@@ -740,15 +739,13 @@ export default function App() {
               </div>
               <div className="text-xs text-slate-400">Click an alert to investigate</div>
             </div>
-            <div className="overflow-x-auto">
-              <div className="grid min-w-[720px] grid-cols-12 gap-2 px-4 py-2 border-b border-slate-800 bg-black/40 text-[11px] uppercase tracking-wider text-slate-500 font-bold font-mono">
-                <span className="col-span-2">Time</span>
-                <span className="col-span-1 text-center">Sig</span>
-                <span className="col-span-1">Sev</span>
-                <span className="col-span-4">Rule</span>
-                <span className="col-span-2">Source</span>
-                <span className="col-span-2">Target</span>
-              </div>
+            <div className="grid grid-cols-2 gap-2 border-b border-slate-800 bg-black/40 px-4 py-3 text-[11px] uppercase tracking-wider text-slate-500 font-bold font-mono sm:grid-cols-12">
+              <span className="sm:col-span-2">Time</span>
+              <span className="text-center sm:col-span-1">Sig</span>
+              <span className="sm:col-span-1">Sev</span>
+              <span className="sm:col-span-4">Rule</span>
+              <span className="sm:col-span-2">Source</span>
+              <span className="sm:col-span-2">Target</span>
             </div>
             <div ref={listRef} className="flex-1 overflow-auto">
               {displayAlerts.length === 0 ? (
@@ -761,13 +758,13 @@ export default function App() {
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-3 shrink-0">
+          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 shrink-0">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-sm font-bold uppercase tracking-wider text-white">Network topology</h2>
                 <p className="text-xs text-slate-500">{scenario.blastRadius}</p>
               </div>
-              <div className="w-48">
+              <div className="w-full md:max-w-[14rem]">
                 <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
                   <span>Attack progress</span>
                   <span>{Math.round(attackProgress)}%</span>
@@ -793,8 +790,8 @@ export default function App() {
           </section>
         </main>
 
-        <aside className="flex flex-col gap-3 lg:col-span-3 lg:min-h-[720px]">
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-3 h-[250px] sm:h-[275px] relative overflow-hidden shrink-0">
+        <aside className="flex flex-col gap-3 md:col-span-3 md:min-h-[720px]">
+          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 h-[250px] sm:h-[275px] relative overflow-hidden shrink-0">
             <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold relative z-10">
               {mode === "sentraq" ? "Virtual L1 AI workstation" : "SOC Tier 1 analyst workstation"}
             </h2>
@@ -803,7 +800,7 @@ export default function App() {
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-3">
+          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4">
             <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">
               {mode === "sentraq" ? "Sentraq AI workflow" : "Current case notes"}
             </h2>
@@ -823,8 +820,6 @@ export default function App() {
           </section>
         </aside>
       </div>
-      </div>
-
       {selected && !attackTriggered && <InvestigationPanel alert={selected} onClose={() => setSelected(null)} />}
       {showReport && (
         <ReportViewer
@@ -843,8 +838,8 @@ export default function App() {
 
 function StatusPill({ label, value, severity }: { label: string; value: string; severity: Severity }) {
   return (
-    <div className={`px-3 py-2 rounded-md border bg-slate-900 ${borderBySeverity(severity)}`}>
-      <span className="text-slate-500 text-xs">{label}: </span>
+    <div className={`flex min-h-11 min-w-[140px] flex-1 items-center justify-between gap-2 rounded-md border bg-slate-900 px-3 py-3 ${borderBySeverity(severity)}`}>
+      <span className="text-xs text-slate-500">{label}:</span>
       <span className={`font-mono font-bold ${severityText(severity)}`}>{value}</span>
     </div>
   );
@@ -879,7 +874,7 @@ function ReportViewer({
           </div>
           <button
             onClick={onClose}
-            className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800"
+            className="min-h-11 rounded-md border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800"
           >
             Close
           </button>
@@ -1021,23 +1016,23 @@ function ReportViewer({
 
             <section className="mt-6">
               <h3 className="border-b border-slate-300 pb-1 text-sm font-black uppercase tracking-wider">Attack Timeline</h3>
-              <div className="mt-2 overflow-x-auto rounded border border-slate-300">
-                <table className="w-full min-w-[720px] text-left text-xs">
+              <div className="mt-2 rounded border border-slate-300">
+                <table className="w-full table-fixed text-left text-xs">
                   <thead className="bg-slate-100 text-slate-600">
                     <tr>
-                      <th className="px-3 py-2">Time</th>
-                      <th className="px-3 py-2">Source</th>
-                      <th className="px-3 py-2">Severity</th>
-                      <th className="px-3 py-2">Evidence</th>
+                      <th className="break-words px-3 py-2 align-top">Time</th>
+                      <th className="break-words px-3 py-2 align-top">Source</th>
+                      <th className="break-words px-3 py-2 align-top">Severity</th>
+                      <th className="break-words px-3 py-2 align-top">Evidence</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(activeLogs.length ? activeLogs : scenario.attackLogs).map((log, index) => (
                       <tr key={`${log.t}-${log.message}`} className="border-t border-slate-200">
-                        <td className="px-3 py-2 font-mono">{timelineLabel(index, scenario.attackLogs.length)}</td>
-                        <td className="px-3 py-2">{log.source}</td>
-                        <td className="px-3 py-2 font-bold uppercase">{log.severity}</td>
-                        <td className="px-3 py-2">{log.message}</td>
+                        <td className="break-words px-3 py-2 align-top font-mono">{timelineLabel(index, scenario.attackLogs.length)}</td>
+                        <td className="break-words px-3 py-2 align-top">{log.source}</td>
+                        <td className="break-words px-3 py-2 align-top font-bold uppercase">{log.severity}</td>
+                        <td className="break-words px-3 py-2 align-top">{log.message}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1107,7 +1102,7 @@ function VideoViewer({ onClose }: { onClose: () => void }) {
           </div>
           <button
             onClick={onClose}
-            className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800"
+            className="min-h-11 rounded-md border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800"
           >
             Close
           </button>

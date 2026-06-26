@@ -26,7 +26,7 @@ export default function AlertRow({
   return (
     <button
       onClick={onClick}
-      className={`w-full min-w-[720px] text-left grid grid-cols-12 gap-2 px-4 py-2.5 border-b border-slate-800/70 hover:bg-slate-800/70 transition text-sm font-mono items-center ${
+      className={`w-full text-left grid grid-cols-1 gap-2 px-4 py-3 border-b border-slate-800/70 hover:bg-slate-800/70 transition text-sm font-mono items-start sm:grid-cols-12 sm:items-center ${
         fresh ? "animate-[slideIn_0.25s_ease-out] bg-slate-800/30" : ""
       } ${
         alert.isAttack ? "bg-red-950/20 hover:bg-red-950/35" : ""
@@ -40,8 +40,8 @@ export default function AlertRow({
           : ""
       }`}
     >
-      <span className="col-span-2 text-slate-400 text-xs">{alert.time}</span>
-      <span className="col-span-1 flex items-center justify-center">
+      <span className="text-slate-400 text-xs sm:col-span-2">{alert.time}</span>
+      <span className="flex items-center sm:justify-center sm:col-span-1">
         <span
           title={alert.isAttack ? "Attack signal" : alert.isFalsePositive ? "Likely false positive" : "Noise"}
           className={`h-2.5 w-2.5 rounded-full ${
@@ -53,7 +53,7 @@ export default function AlertRow({
           }`}
         />
       </span>
-      <span className="col-span-1">
+      <span className="sm:col-span-1">
         <span
           className={`px-2 py-0.5 rounded border text-[10px] uppercase font-bold ${
             SEV_STYLES[alert.severity]
@@ -62,15 +62,15 @@ export default function AlertRow({
           {alert.severity}
         </span>
       </span>
-      <span className="col-span-4 text-slate-100 truncate font-medium">
+      <span className="break-words text-slate-100 font-medium sm:col-span-4">
         {alert.isAttack && <span className="text-red-300 mr-1">ATTACK</span>}
         {alert.isFalsePositive && <span className="text-amber-300 mr-1">FP?</span>}
         {alert.rule}
       </span>
-      <span className="col-span-2 text-slate-400 truncate text-xs">
+      <span className="break-words text-slate-400 text-xs sm:col-span-2">
         {alert.source}
       </span>
-      <span className="col-span-2 text-slate-400 truncate text-xs">
+      <span className="break-words text-slate-400 text-xs sm:col-span-2">
         {alert.dest}
       </span>
     </button>
