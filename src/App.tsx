@@ -594,7 +594,8 @@ export default function App() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-3 p-3 lg:grid-cols-12 lg:min-h-[calc(100vh-65px)]">
+      <div className="overflow-x-auto">
+        <div className="grid min-w-[1180px] grid-cols-12 gap-3 p-3 lg:min-h-[calc(100vh-65px)]">
         <aside className="flex flex-col gap-3 lg:col-span-3 lg:min-h-[720px]">
           <section className={`border rounded-lg p-3 ${
             mode === "sentraq" ? "border-emerald-500/30 bg-emerald-950/10" : "border-amber-500/30 bg-amber-950/10"
@@ -821,6 +822,7 @@ export default function App() {
             </div>
           </section>
         </aside>
+      </div>
       </div>
 
       {selected && !attackTriggered && <InvestigationPanel alert={selected} onClose={() => setSelected(null)} />}
@@ -1112,6 +1114,7 @@ function VideoViewer({ onClose }: { onClose: () => void }) {
         </div>
         <div className="bg-black p-2 sm:p-4">
           <video className="h-auto max-h-[76vh] w-full rounded-md bg-black" controls autoPlay>
+            <source src="/my-dashboard.mp4" type="video/mp4" />
             <source src="/my-dashboard.mkv" type="video/x-matroska" />
             Your browser cannot play this video file.
           </video>
