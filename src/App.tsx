@@ -483,58 +483,41 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: #42526a; border-radius: 8px; }
       `}</style>
 
-      <header className="border-b border-slate-800 bg-zinc-950 px-3 py-2 sm:px-4 sm:py-3 flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <header className="border-b border-slate-800/60 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 py-2.5 sm:px-5 sm:py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-md border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center font-black text-cyan-300 text-sm sm:text-base shrink-0">
+          <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center font-black text-sm sm:text-base shrink-0 shadow-lg ${
+            mode === "sentraq"
+              ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-emerald-500/20"
+              : "bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-cyan-500/20"
+          }`}>
             {mode === "sentraq" ? "AI" : "L1"}
           </div>
           <div className="min-w-0">
             <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
-            <p className="text-[11px] sm:text-xs text-slate-400 truncate">
-              Manual L1 vs Sentraq AI
-            </p>
+            <p className="text-[11px] sm:text-xs text-slate-500 truncate">Real-time attack simulation platform</p>
           </div>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-1.5 sm:gap-2 text-sm sm:flex sm:flex-wrap lg:w-auto lg:justify-end">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-sm">
           <StatusPill
             label={mode === "sentraq" ? "Containment" : "Impact"}
             value={`${timeLeft}s`}
             severity={timeLeft <= 7 ? (mode === "sentraq" ? "low" : "critical") : "medium"}
           />
           <StatusPill label="Rate" value={`${rate}/s`} severity="low" />
-          <div className={`min-h-[40px] sm:min-h-11 break-words rounded-md border px-3 py-2 sm:px-4 sm:py-3 font-bold text-xs sm:text-sm ${
+          <div className={`min-h-[36px] sm:min-h-10 flex items-center rounded-lg border px-3 py-1.5 sm:px-4 sm:py-2 font-bold text-xs sm:text-sm ${
             mode === "sentraq"
-              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-              : "border-amber-500/40 bg-amber-500/10 text-amber-300"
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+              : "border-amber-500/30 bg-amber-500/10 text-amber-400"
           }`}>
             {mode === "sentraq" ? "SENTRAQ AI" : "HUMAN L1"}
           </div>
-          <div className="col-span-2 grid grid-cols-3 gap-1.5 sm:contents">
-            <button
-              onClick={() => setRunning((r) => !r)}
-              disabled={!hasStarted || attackTriggered}
-              className="min-h-[40px] sm:min-h-11 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hover:bg-slate-800 disabled:opacity-50"
-            >
-              {running ? "⏸ Pause" : "▶ Resume"}
-            </button>
-            <button
-              onClick={() => setSoundMuted((muted) => !muted)}
-              className={`min-h-[40px] sm:min-h-11 rounded-md border px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm ${
-                soundMuted
-                  ? "border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800"
-                  : "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-              }`}
-            >
-              {soundMuted ? "🔇" : "🔊"}
-            </button>
-            <button
-              onClick={() => resetSimulation(scenario, mode)}
-              className="min-h-[40px] sm:min-h-11 rounded-md bg-cyan-600 px-3 py-2 sm:px-4 sm:py-3 font-semibold text-white text-xs sm:text-sm hover:bg-cyan-500"
-            >
-              Restart
-            </button>
-          </div>
+          <button
+            onClick={() => resetSimulation(scenario, mode)}
+            className="min-h-[36px] sm:min-h-10 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-1.5 sm:px-5 sm:py-2 font-semibold text-white text-xs sm:text-sm hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 transition-all"
+          >
+            ↻ Restart
+          </button>
         </div>
       </header>
 
@@ -544,8 +527,8 @@ export default function App() {
           : executionStatus === "completed"
           ? "border-red-500/40 bg-red-950/20"
           : executionStatus === "running"
-          ? "border-cyan-500/40 bg-cyan-950/20"
-          : "border-slate-800 bg-slate-950"
+          ? "border-cyan-500/30 bg-cyan-950/15"
+          : "border-slate-700/40 bg-slate-900/80"
       }`}>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -666,8 +649,8 @@ export default function App() {
         )}
 
         {/* ── Row 2: SIEM Alerts (left) | SOC L1 Analyst (right) ── */}
-        <section className="col-span-1 live-siem-alerts border border-slate-800 bg-slate-950 rounded-lg overflow-hidden flex flex-col h-[250px] sm:h-[320px]">
-          <div className="px-2 py-1.5 sm:px-4 sm:py-3 border-b border-slate-800 flex items-center justify-between">
+        <section className="col-span-1 live-siem-alerts border border-slate-700/40 bg-gradient-to-b from-slate-900 to-slate-950 rounded-lg overflow-hidden flex flex-col h-[250px] sm:h-[320px]">
+          <div className="px-2 py-1.5 sm:px-4 sm:py-3 border-b border-slate-800/60 flex items-center justify-between">
             <div className="min-w-0">
               <h2 className="text-[10px] sm:text-sm font-bold uppercase tracking-wider text-white">Live SIEM Alerts</h2>
               <p className="text-[9px] sm:text-xs text-slate-500 truncate">
@@ -686,17 +669,17 @@ export default function App() {
           </div>
         </section>
 
-        <section className="col-span-1 soc-workstation border border-slate-800 bg-slate-950 rounded-lg p-2 sm:p-4 h-[250px] sm:h-[320px] relative overflow-hidden flex flex-col">
+        <section className="col-span-1 soc-workstation border border-slate-800/60 bg-gradient-to-b from-slate-900 to-slate-950 rounded-lg p-2 sm:p-4 h-[250px] sm:h-[320px] relative overflow-hidden flex flex-col">
           <h2 className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold relative z-10">
             {mode === "sentraq" ? "Virtual L1 AI workstation" : "SOC Tier 1 analyst workstation"}
           </h2>
-          <div className="flex-1 flex items-end justify-center relative z-10 scale-[0.45] sm:scale-[0.65] origin-bottom">
+          <div className="flex-1 flex items-center justify-center relative z-10 scale-[0.55] sm:scale-[0.72] origin-center">
             <Analyst state={analystState} thought={thought} stressLevel={stress} />
           </div>
         </section>
 
         {/* ── Row 3: Network Topology ─ full width ── */}
-        <section className="col-span-2 network-topology border border-slate-800 bg-slate-950 rounded-lg p-2 sm:p-4">
+        <section className="col-span-2 network-topology border border-slate-700/40 bg-gradient-to-b from-slate-900 to-slate-950 rounded-lg p-2 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="min-w-0">
               <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Network topology</h2>
@@ -729,99 +712,88 @@ export default function App() {
           )}
         </section>
 
-        {/* ── Row 4: Simulations (left) | Case Notes (right) ── */}
-        <section className="col-span-1 attack-simulations border border-slate-800 bg-slate-950 rounded-lg p-2 sm:p-4 max-h-[300px] sm:max-h-[350px] flex flex-col">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold">Attack simulations</h2>
-            <span className="text-[10px] sm:text-[11px] text-cyan-300 font-mono">{FEATURED_ATTACK_SCENARIOS.length} ready</span>
+        {/* ── Row 4: Attack Simulations ─ 3 cards full width ── */}
+        <section className="col-span-2 attack-simulations border border-slate-800/60 bg-gradient-to-b from-slate-900 to-slate-950 rounded-lg p-3 sm:p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs sm:text-sm uppercase tracking-wider text-slate-400 font-bold">Attack Simulations</h2>
+            <span className="text-[10px] sm:text-[11px] text-cyan-400 font-mono">{FEATURED_ATTACK_SCENARIOS.length} ready</span>
           </div>
-          <div className="space-y-1.5 sm:space-y-2 overflow-y-auto flex-1">
-            {FEATURED_ATTACK_SCENARIOS.map((item) => {
-              const isExpanded = expandedScenario === item.id;
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => {
-                    setExpandedScenario(isExpanded ? null : item.id);
-                    selectScenario(item);
-                  }}
-                  className={`w-full rounded-md border px-2 py-2 sm:px-4 sm:py-3 transition cursor-pointer ${
-                    item.id === scenario.id
-                      ? "border-cyan-500/60 bg-cyan-500/10"
-                      : "border-slate-800 bg-slate-900 hover:border-slate-600"
-                  }`}
-                >
-                  <div className="min-w-0">
-                    <div className="text-[11px] sm:text-sm font-bold text-white truncate">{item.shortName}</div>
-                    <p className="mt-0.5 text-[9px] sm:text-[11px] leading-snug text-slate-400 line-clamp-2">{item.summary}</p>
-                  </div>
-                  {isExpanded && (
-                    <div className="mt-2 flex flex-col gap-1.5 animate-[fadeIn_0.2s]">
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          resetSimulation(item, "manual");
-                        }}
-                        className="min-h-[36px] sm:min-h-11 w-full rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[10px] sm:text-[12px] font-bold text-amber-300 hover:bg-amber-500/20 active:bg-amber-500/30"
-                      >
-                        ▶ Without Sentraq
-                      </button>
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          resetSimulation(item, "sentraq");
-                        }}
-                        className="min-h-[36px] sm:min-h-11 w-full rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-[10px] sm:text-[12px] font-bold text-emerald-300 hover:bg-emerald-500/20 active:bg-emerald-500/30"
-                      >
-                        ▶ With Sentraq
-                      </button>
-                    </div>
-                  )}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            {FEATURED_ATTACK_SCENARIOS.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => selectScenario(item)}
+                className={`rounded-lg border p-2 sm:p-4 transition cursor-pointer hover:shadow-lg ${
+                  item.id === scenario.id
+                    ? "border-cyan-500/50 bg-cyan-500/10 shadow-cyan-500/10"
+                    : "border-slate-700/50 bg-slate-800/40 hover:border-slate-600"
+                }`}
+              >
+                <div className="text-[11px] sm:text-sm font-bold text-white truncate">{item.shortName}</div>
+                <p className="mt-1 text-[9px] sm:text-[11px] leading-snug text-slate-400 line-clamp-2">{item.summary}</p>
+                <div className="mt-2 sm:mt-3 flex flex-col gap-1 sm:gap-1.5">
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      resetSimulation(item, "manual");
+                    }}
+                    className="min-h-[30px] sm:min-h-9 w-full rounded-md border border-amber-500/30 bg-amber-500/8 px-2 py-1 text-[9px] sm:text-[11px] font-bold text-amber-400 hover:bg-amber-500/15 transition"
+                  >
+                    ▶ Without Sentraq
+                  </button>
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      resetSimulation(item, "sentraq");
+                    }}
+                    className="min-h-[30px] sm:min-h-9 w-full rounded-md border border-emerald-500/30 bg-emerald-500/8 px-2 py-1 text-[9px] sm:text-[11px] font-bold text-emerald-400 hover:bg-emerald-500/15 transition"
+                  >
+                    ▶ With Sentraq
+                  </button>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </section>
 
-        <div className="col-span-1 flex flex-col gap-2 sm:gap-3">
-          <section className="case-notes border border-slate-800 bg-slate-950 rounded-lg p-2 sm:p-4 flex-1">
-            <h2 className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold mb-1 sm:mb-2">
-              {mode === "sentraq" ? "Sentraq AI workflow" : "Current case notes"}
-            </h2>
-            <div className="rounded-md border border-slate-800 bg-black/60 p-2 sm:p-3 font-mono text-[9px] sm:text-xs max-h-[140px] sm:max-h-[200px] overflow-y-auto">
-              {mode === "sentraq" ? (
-                <SentraqWorkflow elapsed={elapsed} scenario={scenario} hasStarted={hasStarted} />
-              ) : (
-                <ManualCaseNotes
-                  scenario={scenario}
-                  analystState={analystState}
-                  activeLogs={activeLogs}
-                  hasStarted={hasStarted}
-                  completed={attackTriggered}
-                />
-              )}
-            </div>
-          </section>
+        {/* ── Row 5: Case Notes (left) | Attack Log (right) ── */}
+        <section className="col-span-1 case-notes border border-slate-800/60 bg-gradient-to-b from-slate-900 to-slate-950 rounded-lg p-2 sm:p-4">
+          <h2 className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold mb-1.5 sm:mb-2">
+            {mode === "sentraq" ? "Sentraq AI workflow" : "Current case notes"}
+          </h2>
+          <div className="rounded-md border border-slate-800/60 bg-black/40 p-2 sm:p-3 font-mono text-[9px] sm:text-xs max-h-[160px] sm:max-h-[200px] overflow-y-auto">
+            {mode === "sentraq" ? (
+              <SentraqWorkflow elapsed={elapsed} scenario={scenario} hasStarted={hasStarted} />
+            ) : (
+              <ManualCaseNotes
+                scenario={scenario}
+                analystState={analystState}
+                activeLogs={activeLogs}
+                hasStarted={hasStarted}
+                completed={attackTriggered}
+              />
+            )}
+          </div>
+        </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-2 sm:p-4">
-            <h2 className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold mb-1 sm:mb-2">Attack automation log</h2>
-            <div className="overflow-y-auto rounded-md bg-black/60 border border-slate-800 p-2 font-mono text-[9px] sm:text-xs max-h-[100px] sm:max-h-[140px]">
-              {!hasStarted ? (
-                <p className="text-slate-500">Logs will start after executing an attack.</p>
-              ) : activeLogs.length === 0 ? (
-                <p className="text-slate-500">Waiting for telemetry...</p>
-              ) : (
-                activeLogs.map((log, index) => (
-                  <div key={`${log.t}-${log.message}`} className="mb-1 truncate">
-                    <span className={severityText(log.severity)}>{timelineLabel(index, scenario.attackLogs.length)}</span>
-                    <span className="text-slate-500"> [{log.source}]</span>
-                    <span className="text-slate-300"> {log.message}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
-        </div>
+        <section className="col-span-1 border border-slate-800/60 bg-gradient-to-b from-slate-900 to-slate-950 rounded-lg p-2 sm:p-4">
+          <h2 className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold mb-1.5 sm:mb-2">Attack automation log</h2>
+          <div className="overflow-y-auto rounded-md bg-black/40 border border-slate-800/60 p-2 font-mono text-[9px] sm:text-xs max-h-[160px] sm:max-h-[200px]">
+            {!hasStarted ? (
+              <p className="text-slate-600">Logs will start after executing an attack.</p>
+            ) : activeLogs.length === 0 ? (
+              <p className="text-slate-600">Waiting for telemetry...</p>
+            ) : (
+              activeLogs.map((log, index) => (
+                <div key={`${log.t}-${log.message}`} className="mb-1 truncate">
+                  <span className={severityText(log.severity)}>{timelineLabel(index, scenario.attackLogs.length)}</span>
+                  <span className="text-slate-600"> [{log.source}]</span>
+                  <span className="text-slate-300"> {log.message}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
       </div>
 
@@ -843,8 +815,8 @@ export default function App() {
 
 function StatusPill({ label, value, severity }: { label: string; value: string; severity: Severity }) {
   return (
-    <div className={`flex min-h-[40px] sm:min-h-11 min-w-0 sm:min-w-[120px] flex-1 items-center justify-between gap-1.5 sm:gap-2 rounded-md border bg-slate-900 px-2 py-2 sm:px-3 sm:py-3 ${borderBySeverity(severity)}`}>
-      <span className="text-[11px] sm:text-xs text-slate-500 shrink-0">{label}:</span>
+    <div className={`flex min-h-[36px] sm:min-h-10 min-w-0 sm:min-w-[110px] flex-1 items-center justify-between gap-1.5 rounded-lg border bg-slate-900/60 px-2.5 py-1.5 sm:px-3 sm:py-2 ${borderBySeverity(severity)}`}>
+      <span className="text-[10px] sm:text-xs text-slate-500 shrink-0">{label}:</span>
       <span className={`font-mono font-bold text-sm sm:text-base ${severityText(severity)}`}>{value}</span>
     </div>
   );
@@ -1151,18 +1123,18 @@ function ReportField({ label, value }: { label: string; value: string }) {
 
 function CompactMetric({ label, value, danger }: { label: string; value: number; danger?: boolean }) {
   return (
-    <div className="rounded border border-slate-800 bg-black/30 px-0.5 py-0.5 sm:px-1.5 sm:py-1 text-center">
-      <div className={`text-[10px] sm:text-sm font-bold font-mono ${danger ? "text-red-300" : "text-white"}`}>{value}</div>
-      <div className="text-[7px] sm:text-[9px] text-slate-500 uppercase">{label}</div>
+    <div className="rounded-md border border-slate-700/40 bg-slate-800/30 px-1.5 py-1 sm:px-2 sm:py-1.5 text-center">
+      <div className={`text-sm sm:text-base font-bold font-mono ${danger ? "text-red-400" : "text-slate-100"}`}>{value}</div>
+      <div className="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-wider">{label}</div>
     </div>
   );
 }
 
 function SeverityTile({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="rounded-md border border-slate-800 bg-slate-900 p-0.5 sm:p-1.5 lg:p-2 text-center">
-      <div className={`text-[10px] sm:text-base lg:text-lg font-bold font-mono ${color}`}>{value}</div>
-      <div className="text-[7px] sm:text-[9px] lg:text-[10px] text-slate-500 uppercase">{label}</div>
+    <div className="rounded-md border border-slate-700/40 bg-slate-800/20 px-1.5 py-1 sm:p-2 text-center">
+      <div className={`text-sm sm:text-lg font-bold font-mono ${color}`}>{value}</div>
+      <div className="text-[8px] sm:text-[10px] text-slate-500 uppercase tracking-wider">{label}</div>
     </div>
   );
 }
@@ -1310,33 +1282,45 @@ function Topology({ scenario, progress, contained }: { scenario: AttackScenario;
   ];
 
   return (
-    <div className="topology-map relative h-[170px] rounded-md border border-slate-800 bg-[#07111f] overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(#132033_1px,transparent_1px),linear-gradient(90deg,#132033_1px,transparent_1px)] bg-[size:22px_22px] opacity-60" />
+    <div className="topology-map relative h-[180px] sm:h-[200px] rounded-lg border border-slate-700/40 bg-[#060e1a] overflow-hidden shadow-inner">
+      {/* Subtle grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(#0d1b2e_1px,transparent_1px),linear-gradient(90deg,#0d1b2e_1px,transparent_1px)] bg-[size:20px_20px] opacity-40" />
+      {/* Subtle radial glow in center */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.06)_0%,transparent_70%)]" />
       {zones.map((zone) => (
         <div
           key={zone.label}
-          className="absolute top-2 bottom-2 rounded border border-slate-700/50 bg-slate-900/20"
+          className="absolute top-2 bottom-2 rounded-md border border-slate-700/30 bg-slate-800/10"
           style={{ left: zone.left, width: zone.width }}
         >
-          <div className="px-2 py-1 text-[9px] uppercase tracking-wider text-slate-500">{zone.label}</div>
+          <div className="px-2 py-1 text-[8px] sm:text-[9px] uppercase tracking-widest text-slate-600 font-medium">{zone.label}</div>
         </div>
       ))}
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="0.8" result="coloredBlur" />
+            <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
         {scenario.topology.links.map((link, index) => {
           const from = nodesById[link.from];
           const to = nodesById[link.to];
           const active = progress > index * 14;
           const midX = (from.x + to.x) / 2;
-          const path = `M ${from.x} ${from.y} L ${midX} ${from.y} L ${midX} ${to.y} L ${to.x} ${to.y}`;
+          const path = `M ${from.x} ${from.y} Q ${midX} ${from.y} ${midX} ${(from.y + to.y) / 2} Q ${midX} ${to.y} ${to.x} ${to.y}`;
+          const isAttack = link.status === "attack";
           return (
             <path
               key={`${link.from}-${link.to}`}
               d={path}
-              stroke={contained && link.status === "attack" ? "#34d399" : link.status === "attack" && active ? "#ef4444" : link.status === "noisy" ? "#f59e0b" : "#334155"}
-              strokeWidth={link.status === "attack" && active ? 0.9 : 0.45}
-              strokeDasharray={link.status === "attack" ? "2.2 1.4" : "0"}
-              opacity={active ? 0.9 : 0.35}
+              stroke={contained && isAttack ? "#34d399" : isAttack && active ? "#f87171" : link.status === "noisy" ? "#fbbf24" : "#1e293b"}
+              strokeWidth={isAttack && active ? 0.7 : 0.35}
+              strokeDasharray={isAttack ? "3 2" : "0"}
+              opacity={active ? 1 : 0.3}
               fill="none"
+              filter={isAttack && active ? "url(#glow)" : undefined}
+              strokeLinecap="round"
             />
           );
         })}
@@ -1345,15 +1329,19 @@ function Topology({ scenario, progress, contained }: { scenario: AttackScenario;
       {scenario.topology.nodes.map((node) => (
         <div
           key={node.id}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
+          className="absolute -translate-x-1/2 -translate-y-1/2 transition-transform"
           style={{ left: `${node.x}%`, top: `${node.y}%` }}
         >
-          <div className={`topology-node-card w-24 rounded border px-1.5 py-1 shadow-xl backdrop-blur ${contained && node.status !== "noisy" ? "bg-emerald-950/40 border-emerald-500/50" : nodeStyle(node.status)}`}>
+          <div className={`topology-node-card w-20 sm:w-24 rounded-md border px-1.5 py-1 shadow-lg ${
+            contained && node.status !== "noisy"
+              ? "bg-emerald-950/60 border-emerald-500/40 shadow-emerald-500/10"
+              : nodeStyle(node.status)
+          }`}>
             <div className="flex items-center gap-1">
-              <span className={`h-2 w-2 rounded-sm ${contained && node.status !== "noisy" ? "bg-emerald-400" : nodeDot(node.status)}`} />
-              <span className="text-[10px] font-bold text-white truncate">{node.label}</span>
+              <span className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full ${contained && node.status !== "noisy" ? "bg-emerald-400" : nodeDot(node.status)}`} />
+              <span className="text-[9px] sm:text-[10px] font-semibold text-slate-200 truncate">{node.label}</span>
             </div>
-            <div className="text-[9px] text-slate-400 truncate">{node.role}</div>
+            <div className="text-[8px] sm:text-[9px] text-slate-500 truncate">{node.role}</div>
           </div>
         </div>
       ))}

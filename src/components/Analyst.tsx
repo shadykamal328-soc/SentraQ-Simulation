@@ -13,7 +13,7 @@ export default function Analyst({ state, thought, stressLevel }: Props) {
   const shirtShade = panicking ? "#991b1b" : "#1e40af";
 
   return (
-    <div className="relative flex flex-col items-center justify-end h-full w-full pt-14">
+    <div className="relative flex flex-col items-center justify-center h-full w-full pt-8">
       {/* Thought bubble */}
       {thought && (
         <div className="absolute top-0 left-2 right-2 z-10">
