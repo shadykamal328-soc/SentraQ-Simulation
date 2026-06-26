@@ -25,3 +25,107 @@ svg {
   max-width: 100%;
   height: auto;
 }
+
+@media (max-width: 768px) {
+  .dashboard-shell {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .dashboard-shell > aside,
+  .dashboard-shell > main {
+    display: contents !important;
+  }
+
+  .dashboard-shell .execution-status,
+  .dashboard-shell .live-siem-alerts,
+  .dashboard-shell .l1-focus,
+  .dashboard-shell .attack-simulations,
+  .dashboard-shell .network-topology,
+  .dashboard-shell .soc-workstation,
+  .dashboard-shell .sentraq-workflow,
+  .dashboard-shell .case-notes {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .dashboard-shell .execution-status {
+    order: 1;
+  }
+
+  .dashboard-shell .live-siem-alerts {
+    order: 2;
+    min-height: 200px;
+  }
+
+  .dashboard-shell .l1-focus {
+    order: 3;
+  }
+
+  .dashboard-shell .attack-simulations {
+    order: 4;
+  }
+
+  .dashboard-shell .network-topology {
+    order: 5;
+  }
+
+  .dashboard-shell .soc-workstation {
+    order: 6;
+  }
+
+  .dashboard-shell .sentraq-workflow {
+    order: 7;
+  }
+
+  .dashboard-shell .case-notes {
+    order: 8;
+  }
+
+  .dashboard-shell .alerts-header {
+    grid-template-columns: minmax(64px, 1fr) repeat(3, minmax(0, 1fr));
+    font-size: 12px;
+  }
+
+  .dashboard-shell .alert-row {
+    min-height: 36px;
+    font-size: 12px;
+    grid-template-columns: minmax(64px, 1fr) repeat(3, minmax(0, 1fr));
+  }
+
+  .dashboard-shell .alert-row .col-sig,
+  .dashboard-shell .alert-row .col-sev {
+    display: none;
+  }
+
+  .dashboard-shell .alert-row .col-time,
+  .dashboard-shell .alert-row .col-rule,
+  .dashboard-shell .alert-row .col-source,
+  .dashboard-shell .alert-row .col-target {
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .dashboard-shell .attack-simulations .attack-actions {
+    width: 100%;
+  }
+
+  .dashboard-shell .attack-simulations .attack-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .dashboard-shell .network-topology .topology-hint {
+    display: block;
+  }
+
+  .dashboard-shell .network-topology .topology-scroll {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .dashboard-shell .network-topology .topology-map {
+    width: max-content;
+    min-width: 100%;
+  }
+}

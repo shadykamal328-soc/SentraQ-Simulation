@@ -535,7 +535,7 @@ export default function App() {
         </div>
       </header>
 
-      <section className={`mx-4 mt-4 rounded-lg border px-4 py-4 ${
+      <section className={`execution-status mx-4 mt-4 rounded-lg border px-4 py-4 ${
         executionStatus === "contained"
           ? "border-emerald-500/40 bg-emerald-950/20"
           : executionStatus === "completed"
@@ -594,9 +594,9 @@ export default function App() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-12 md:min-h-[calc(100vh-65px)]">
+      <div className="dashboard-shell grid grid-cols-1 gap-3 p-4 md:grid-cols-12 md:min-h-[calc(100vh-65px)]">
         <aside className="flex flex-col gap-3 md:col-span-3 md:min-h-[720px]">
-          <section className={`border rounded-lg p-4 ${
+          <section className={`l1-focus border rounded-lg p-4 ${
             mode === "sentraq" ? "border-emerald-500/30 bg-emerald-950/10" : "border-amber-500/30 bg-amber-950/10"
           }`}>
             <h2 className={`text-xs uppercase tracking-wider font-bold mb-2 ${
@@ -640,7 +640,7 @@ export default function App() {
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 h-[300px]">
+          <section className="attack-simulations border border-slate-800 bg-slate-950 rounded-lg p-4 h-[300px]">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold">Attack simulations</h2>
               <span className="text-[11px] text-cyan-300 font-mono">{FEATURED_ATTACK_SCENARIOS.length} ready</span>
@@ -661,7 +661,7 @@ export default function App() {
                       <div className="text-sm font-bold text-white truncate">{item.shortName}</div>
                       <p className="mt-0.5 text-[11px] leading-snug text-slate-400 line-clamp-2">{item.summary}</p>
                     </div>
-                    <div className="flex w-full shrink-0 flex-col gap-2 sm:w-28">
+                    <div className="attack-actions flex w-full shrink-0 flex-col gap-2 sm:w-28">
                       <button
                         onClick={(event) => {
                           event.stopPropagation();
@@ -709,7 +709,7 @@ export default function App() {
 
         <main className="flex flex-col gap-3 md:col-span-6 md:min-h-[720px]">
           {mode === "sentraq" && sentraqContained && (
-            <section className="rounded-lg border border-emerald-500/50 bg-emerald-950/30 px-4 py-4 shadow-lg shadow-emerald-950/30">
+            <section className="sentraq-workflow rounded-lg border border-emerald-500/50 bg-emerald-950/30 px-4 py-4 shadow-lg shadow-emerald-950/30">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-sm font-black uppercase tracking-wider text-emerald-300">
@@ -729,7 +729,7 @@ export default function App() {
             </section>
           )}
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg overflow-hidden flex flex-col h-[340px] sm:h-[360px] shrink-0">
+          <section className="live-siem-alerts border border-slate-800 bg-slate-950 rounded-lg overflow-hidden flex flex-col h-[340px] sm:h-[360px] shrink-0">
             <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-bold uppercase tracking-wider text-white">Live SIEM Alerts</h2>
@@ -739,13 +739,13 @@ export default function App() {
               </div>
               <div className="text-xs text-slate-400">Click an alert to investigate</div>
             </div>
-            <div className="grid grid-cols-2 gap-2 border-b border-slate-800 bg-black/40 px-4 py-3 text-[11px] uppercase tracking-wider text-slate-500 font-bold font-mono sm:grid-cols-12">
-              <span className="sm:col-span-2">Time</span>
-              <span className="text-center sm:col-span-1">Sig</span>
-              <span className="sm:col-span-1">Sev</span>
-              <span className="sm:col-span-4">Rule</span>
-              <span className="sm:col-span-2">Source</span>
-              <span className="sm:col-span-2">Target</span>
+            <div className="alerts-header grid grid-cols-2 gap-2 border-b border-slate-800 bg-black/40 px-4 py-3 text-[11px] uppercase tracking-wider text-slate-500 font-bold font-mono sm:grid-cols-12">
+              <span className="col-time sm:col-span-2">Time</span>
+              <span className="col-sig text-center sm:col-span-1">Sig</span>
+              <span className="col-sev sm:col-span-1">Sev</span>
+              <span className="col-rule sm:col-span-4">Rule</span>
+              <span className="col-source sm:col-span-2">Source</span>
+              <span className="col-target sm:col-span-2">Target</span>
             </div>
             <div ref={listRef} className="flex-1 overflow-auto">
               {displayAlerts.length === 0 ? (
@@ -758,7 +758,7 @@ export default function App() {
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 shrink-0">
+          <section className="network-topology border border-slate-800 bg-slate-950 rounded-lg p-4 shrink-0">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-sm font-bold uppercase tracking-wider text-white">Network topology</h2>
@@ -777,7 +777,10 @@ export default function App() {
                 </div>
               </div>
             </div>
-            <Topology scenario={scenario} progress={mode === "sentraq" ? sentraqProgress : attackProgress} contained={sentraqContained} />
+            <p className="topology-hint mt-2 hidden text-[11px] text-slate-500">Swipe to explore →</p>
+            <div className="topology-scroll">
+              <Topology scenario={scenario} progress={mode === "sentraq" ? sentraqProgress : attackProgress} contained={sentraqContained} />
+            </div>
             {mode === "sentraq" && hasStarted && (
               <button
                 onClick={() => setShowVideo(true)}
@@ -791,7 +794,7 @@ export default function App() {
         </main>
 
         <aside className="flex flex-col gap-3 md:col-span-3 md:min-h-[720px]">
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 h-[250px] sm:h-[275px] relative overflow-hidden shrink-0">
+          <section className="soc-workstation border border-slate-800 bg-slate-950 rounded-lg p-4 h-[250px] sm:h-[275px] relative overflow-hidden shrink-0">
             <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold relative z-10">
               {mode === "sentraq" ? "Virtual L1 AI workstation" : "SOC Tier 1 analyst workstation"}
             </h2>
@@ -800,7 +803,7 @@ export default function App() {
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4">
+          <section className="case-notes border border-slate-800 bg-slate-950 rounded-lg p-4">
             <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">
               {mode === "sentraq" ? "Sentraq AI workflow" : "Current case notes"}
             </h2>
@@ -1305,7 +1308,7 @@ function Topology({ scenario, progress, contained }: { scenario: AttackScenario;
   ];
 
   return (
-    <div className="relative h-[170px] rounded-md border border-slate-800 bg-[#07111f] overflow-hidden">
+    <div className="topology-map relative h-[170px] rounded-md border border-slate-800 bg-[#07111f] overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(#132033_1px,transparent_1px),linear-gradient(90deg,#132033_1px,transparent_1px)] bg-[size:22px_22px] opacity-60" />
       {zones.map((zone) => (
         <div
