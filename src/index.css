@@ -82,7 +82,7 @@ button, a, [role="button"] {
 
   /* Mobile: topology nodes smaller */
   .dashboard-shell .topology-node-card {
-    width: 5rem; /* 80px instead of 96px */
+    width: 5.8rem; /* ~93px for better icon spacing */
   }
 }
 

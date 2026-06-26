@@ -483,102 +483,61 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: #42526a; border-radius: 8px; }
       `}</style>
 
-      <header className="border-b border-slate-800/60 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 py-2.5 sm:px-5 sm:py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <header className="border-b border-slate-800/60 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center font-black text-sm sm:text-base shrink-0 shadow-lg ${
-            mode === "sentraq"
-              ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-emerald-500/20"
-              : "bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-cyan-500/20"
-          }`}>
-            {mode === "sentraq" ? "AI" : "L1"}
-          </div>
+          <img src="/logo.png" alt="Sentraq Logo" className="h-10 w-auto object-contain shrink-0" />
           <div className="min-w-0">
             <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
             <p className="text-[11px] sm:text-xs text-slate-500 truncate">Real-time attack simulation platform</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-sm">
-          <StatusPill
-            label={mode === "sentraq" ? "Containment" : "Impact"}
-            value={`${timeLeft}s`}
-            severity={timeLeft <= 7 ? (mode === "sentraq" ? "low" : "critical") : "medium"}
-          />
-          <StatusPill label="Rate" value={`${rate}/s`} severity="low" />
-          <div className={`min-h-[36px] sm:min-h-10 flex items-center rounded-lg border px-3 py-1.5 sm:px-4 sm:py-2 font-bold text-xs sm:text-sm ${
-            mode === "sentraq"
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-              : "border-amber-500/30 bg-amber-500/10 text-amber-400"
-          }`}>
-            {mode === "sentraq" ? "SENTRAQ AI" : "HUMAN L1"}
+        <div className="flex flex-col gap-2.5 md:items-end w-full md:w-auto">
+          {/* Simulation status inline row */}
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+            <span className="font-semibold text-slate-400">Simulation:</span>
+            <span className="font-bold text-white bg-slate-900 px-2 py-0.5 rounded border border-slate-800">{scenario.name}</span>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+              mode === "sentraq"
+                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+            }`}>
+              {mode === "sentraq" ? "With Sentraq" : "Without Sentraq"}
+            </span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <div className="flex items-center gap-1.5 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">
+              <span className={`h-2 w-2 rounded-full ${
+                executionStatus === "contained" ? "bg-emerald-500 animate-pulse" :
+                executionStatus === "completed" ? "bg-red-500 animate-pulse" :
+                executionStatus === "running" ? "bg-cyan-500 animate-pulse" : "bg-slate-500"
+              }`} />
+              <span className="capitalize text-slate-300 font-medium font-mono text-[10px]">{executionStatus}</span>
+            </div>
           </div>
-          <button
-            onClick={() => resetSimulation(scenario, mode)}
-            className="min-h-[36px] sm:min-h-10 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-1.5 sm:px-5 sm:py-2 font-semibold text-white text-xs sm:text-sm hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 transition-all"
-          >
-            ↻ Restart
-          </button>
+
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-sm">
+            <StatusPill
+              label={mode === "sentraq" ? "Containment" : "Impact"}
+              value={`${timeLeft}s`}
+              severity={timeLeft <= 7 ? (mode === "sentraq" ? "low" : "critical") : "medium"}
+            />
+            <StatusPill label="Rate" value={`${rate}/s`} severity="low" />
+            <div className={`h-9 sm:h-10 flex items-center rounded-lg border px-3 py-1.5 font-bold text-xs sm:text-sm ${
+              mode === "sentraq"
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                : "border-amber-500/30 bg-amber-500/10 text-amber-400"
+            }`}>
+              {mode === "sentraq" ? "SENTRAQ AI" : "HUMAN L1"}
+            </div>
+            <button
+              onClick={() => resetSimulation(scenario, mode)}
+              className="h-9 sm:h-10 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-1.5 font-semibold text-white text-xs sm:text-sm hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 transition-all"
+            >
+              ↻ Restart
+            </button>
+          </div>
         </div>
       </header>
-
-      <section className={`execution-status mx-3 sm:mx-4 mt-2 sm:mt-4 rounded-lg border px-3 py-3 sm:px-4 sm:py-4 ${
-        executionStatus === "contained"
-          ? "border-emerald-500/40 bg-emerald-950/20"
-          : executionStatus === "completed"
-          ? "border-red-500/40 bg-red-950/20"
-          : executionStatus === "running"
-          ? "border-cyan-500/30 bg-cyan-950/15"
-          : "border-slate-700/40 bg-slate-900/80"
-      }`}>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <div className={`text-xs uppercase tracking-wider font-bold ${
-              executionStatus === "contained"
-                ? "text-emerald-300"
-                : executionStatus === "completed"
-                ? "text-red-300"
-                : executionStatus === "running"
-                ? "text-cyan-300"
-                : "text-slate-400"
-            }`}>
-              Execution status
-            </div>
-            <div className="mt-1 text-xs sm:text-sm text-slate-200">
-              {executionStatus === "ready" &&
-                `Ready to execute ${scenario.name}. Choose with or without Sentraq.`}
-              {executionStatus === "running" &&
-                `${scenario.name} is running. Attack sequence completes in 20 seconds.`}
-              {executionStatus === "completed" &&
-                `${scenario.name} executed successfully. Business impact reached in the simulation.`}
-              {executionStatus === "contained" &&
-                `${scenario.name} executed successfully, and Sentraq contained it before business impact.`}
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono">
-            {mode === "sentraq" && sentraqContained && (
-              <button
-                onClick={() => setShowReport(true)}
-                className="min-h-11 rounded border border-cyan-500/40 bg-cyan-500/10 px-4 py-3 font-bold text-cyan-300 hover:bg-cyan-500/20"
-              >
-                View report
-              </button>
-            )}
-            <span className="max-w-full break-all rounded border border-slate-700 bg-black/30 px-2 py-1 text-slate-300">
-              scenario={scenario.id}
-            </span>
-            <span className={`max-w-full break-all rounded border px-2 py-1 ${
-              mode === "sentraq"
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                : "border-amber-500/40 bg-amber-500/10 text-amber-300"
-            }`}>
-              mode={mode === "sentraq" ? "with_sentraq" : "without_sentraq"}
-            </span>
-            <span className="max-w-full break-all rounded border border-slate-700 bg-black/30 px-2 py-1 text-slate-300">
-              duration=20s
-            </span>
-          </div>
-        </div>
-      </section>
 
       <div className="dashboard-shell grid grid-cols-2 gap-2 p-2 sm:gap-3 sm:p-3">
 
@@ -815,9 +774,9 @@ export default function App() {
 
 function StatusPill({ label, value, severity }: { label: string; value: string; severity: Severity }) {
   return (
-    <div className={`flex min-h-[36px] sm:min-h-10 min-w-0 sm:min-w-[110px] flex-1 items-center justify-between gap-1.5 rounded-lg border bg-slate-900/60 px-2.5 py-1.5 sm:px-3 sm:py-2 ${borderBySeverity(severity)}`}>
-      <span className="text-[10px] sm:text-xs text-slate-500 shrink-0">{label}:</span>
-      <span className={`font-mono font-bold text-sm sm:text-base ${severityText(severity)}`}>{value}</span>
+    <div className={`flex h-9 sm:h-10 items-center justify-between gap-2.5 rounded-lg border bg-slate-900/60 px-3 py-1.5 shrink-0 ${borderBySeverity(severity)}`}>
+      <span className="text-[10px] sm:text-xs text-slate-500 shrink-0 font-medium">{label}:</span>
+      <span className={`font-mono font-bold text-xs sm:text-sm shrink-0 ${severityText(severity)}`}>{value}</span>
     </div>
   );
 }
@@ -1271,57 +1230,155 @@ function SentraqWorkflow({
   );
 }
 
+function getNodeIcon(id: string, role: string) {
+  const normId = id.toLowerCase();
+  const normRole = role.toLowerCase();
+
+  // Cloud/Internet/Botnet/Proxies
+  if (normId.includes("internet") || normId.includes("botnet") || normId.includes("exfil") || normRole.includes("external") || normRole.includes("proxy") || normRole.includes("ingress")) {
+    return (
+      <svg className="w-3.5 h-3.5 text-sky-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+      </svg>
+    );
+  }
+  // Mail / Exchange
+  if (normId.includes("mail") || normRole.includes("mail")) {
+    return (
+      <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    );
+  }
+  // Active Directory / Domain Controller / IDP
+  if (normId.includes("idp") || normId.includes("dc") || normId.includes("ad") || normRole.includes("identity") || normRole.includes("controller") || normRole.includes("directory")) {
+    return (
+      <svg className="w-3.5 h-3.5 text-red-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    );
+  }
+  // Data Store / File Storage / Database
+  if (normId.includes("file") || normId.includes("storage") || normId.includes("db") || normId.includes("data") || normId.includes("repo") || normRole.includes("store") || normRole.includes("share") || normRole.includes("repo")) {
+    return (
+      <svg className="w-3.5 h-3.5 text-purple-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4" />
+      </svg>
+    );
+  }
+  // Backup Vault / Recovery
+  if (normId.includes("backup") || normId.includes("vault") || normRole.includes("backup")) {
+    return (
+      <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    );
+  }
+  // Network Protection / Firewall / WAF / CDN / Balancers
+  if (normId.includes("fw") || normId.includes("waf") || normId.includes("lb") || normRole.includes("filter") || normRole.includes("protection") || normRole.includes("balancer")) {
+    return (
+      <svg className="w-3.5 h-3.5 text-orange-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    );
+  }
+  // Monitoring / Alerts / SIEM / SOC
+  if (normId.includes("soc") || normId.includes("siem") || normRole.includes("console") || normRole.includes("alert")) {
+    return (
+      <svg className="w-3.5 h-3.5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+    );
+  }
+  // Default Node Workstation / Client
+  return (
+    <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  );
+}
+
 function Topology({ scenario, progress, contained }: { scenario: AttackScenario; progress: number; contained?: boolean }) {
   const nodesById = Object.fromEntries(scenario.topology.nodes.map((node) => [node.id, node]));
   const zones = [
-    { label: "External", left: "1%", width: "18%" },
-    { label: "Perimeter", left: "20%", width: "18%" },
-    { label: "DMZ", left: "39%", width: "20%" },
-    { label: "Internal", left: "60%", width: "24%" },
-    { label: "SOC", left: "85%", width: "14%" },
+    { label: "External Ingress", left: "1%", width: "18%" },
+    { label: "DMZ & Identity", left: "20%", width: "18%" },
+    { label: "Corporate LAN", left: "39%", width: "20%" },
+    { label: "Core Infrastructure", left: "60%", width: "24%" },
+    { label: "Critical Assets", left: "85%", width: "14%" },
   ];
 
   return (
-    <div className="topology-map relative h-[180px] sm:h-[200px] rounded-lg border border-slate-700/40 bg-[#060e1a] overflow-hidden shadow-inner">
-      {/* Subtle grid background */}
-      <div className="absolute inset-0 bg-[linear-gradient(#0d1b2e_1px,transparent_1px),linear-gradient(90deg,#0d1b2e_1px,transparent_1px)] bg-[size:20px_20px] opacity-40" />
-      {/* Subtle radial glow in center */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.06)_0%,transparent_70%)]" />
+    <div className="topology-map relative h-[210px] sm:h-[240px] rounded-lg border border-slate-700/40 bg-[#040914] overflow-hidden shadow-inner pb-8 animate-[fadeIn_0.5s_ease-out]">
+      {/* Sci-fi Blueprint Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(#0f1e36_1px,transparent_1px),linear-gradient(90deg,#0f1e36_1px,transparent_1px)] bg-[size:16px_16px] opacity-25" />
+      {/* Radial network glow at center */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(6,182,212,0.08)_0%,transparent_60%)]" />
+      
       {zones.map((zone) => (
         <div
           key={zone.label}
-          className="absolute top-2 bottom-2 rounded-md border border-slate-700/30 bg-slate-800/10"
+          className="absolute top-2 bottom-9 rounded border border-slate-850/40 bg-slate-950/20"
           style={{ left: zone.left, width: zone.width }}
         >
-          <div className="px-2 py-1 text-[8px] sm:text-[9px] uppercase tracking-widest text-slate-600 font-medium">{zone.label}</div>
+          <div className="px-2 py-1 text-[8px] uppercase tracking-widest text-slate-600 font-bold truncate">{zone.label}</div>
         </div>
       ))}
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+      
+      <svg className="absolute inset-0 h-full w-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
           <filter id="glow">
-            <feGaussianBlur stdDeviation="0.8" result="coloredBlur" />
-            <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            <feGaussianBlur stdDeviation="0.6" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
+        
         {scenario.topology.links.map((link, index) => {
           const from = nodesById[link.from];
           const to = nodesById[link.to];
+          if (!from || !to) return null;
+          
           const active = progress > index * 14;
           const midX = (from.x + to.x) / 2;
           const path = `M ${from.x} ${from.y} Q ${midX} ${from.y} ${midX} ${(from.y + to.y) / 2} Q ${midX} ${to.y} ${to.x} ${to.y}`;
           const isAttack = link.status === "attack";
+          
+          // Color coding for links
+          const strokeColor = contained && isAttack
+            ? "#10b981"
+            : isAttack && active
+              ? "#ef4444"
+              : link.status === "noisy"
+                ? "#f59e0b"
+                : "#1e293b";
+                
           return (
-            <path
-              key={`${link.from}-${link.to}`}
-              d={path}
-              stroke={contained && isAttack ? "#34d399" : isAttack && active ? "#f87171" : link.status === "noisy" ? "#fbbf24" : "#1e293b"}
-              strokeWidth={isAttack && active ? 0.7 : 0.35}
-              strokeDasharray={isAttack ? "3 2" : "0"}
-              opacity={active ? 1 : 0.3}
-              fill="none"
-              filter={isAttack && active ? "url(#glow)" : undefined}
-              strokeLinecap="round"
-            />
+            <g key={`${link.from}-${link.to}`}>
+              {/* Connection link path */}
+              <path
+                d={path}
+                stroke={strokeColor}
+                strokeWidth={isAttack && active ? 0.95 : 0.4}
+                strokeDasharray={isAttack && !active ? "2 2" : "0"}
+                opacity={active ? 1 : 0.25}
+                fill="none"
+                filter={isAttack && active ? "url(#glow)" : undefined}
+                strokeLinecap="round"
+              />
+              {/* Animated data packets traveling on paths */}
+              {active && (
+                <circle r="0.75" fill={contained && isAttack ? "#34d399" : isAttack ? "#fca5a5" : "#fcd34d"}>
+                  <animateMotion
+                    dur={isAttack ? "1.6s" : "2.8s"}
+                    repeatCount="indefinite"
+                    path={path}
+                  />
+                </circle>
+              )}
+            </g>
           );
         })}
       </svg>
@@ -1329,22 +1386,40 @@ function Topology({ scenario, progress, contained }: { scenario: AttackScenario;
       {scenario.topology.nodes.map((node) => (
         <div
           key={node.id}
-          className="absolute -translate-x-1/2 -translate-y-1/2 transition-transform"
-          style={{ left: `${node.x}%`, top: `${node.y}%` }}
+          className="absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300"
+          style={{ left: `${node.x}%`, top: `${node.y - 4}%` }}
         >
-          <div className={`topology-node-card w-20 sm:w-24 rounded-md border px-1.5 py-1 shadow-lg ${
+          <div className={`topology-node-card w-24 sm:w-28 rounded-lg border p-1.5 shadow-2xl transition-all duration-300 backdrop-blur-md bg-slate-950/80 ${
             contained && node.status !== "noisy"
-              ? "bg-emerald-950/60 border-emerald-500/40 shadow-emerald-500/10"
+              ? "bg-emerald-950/70 border-emerald-500/50 shadow-emerald-500/10"
               : nodeStyle(node.status)
           }`}>
-            <div className="flex items-center gap-1">
-              <span className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full ${contained && node.status !== "noisy" ? "bg-emerald-400" : nodeDot(node.status)}`} />
-              <span className="text-[9px] sm:text-[10px] font-semibold text-slate-200 truncate">{node.label}</span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              {getNodeIcon(node.id, node.role)}
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-100 truncate flex-1 leading-none">{node.label}</span>
             </div>
-            <div className="text-[8px] sm:text-[9px] text-slate-500 truncate">{node.role}</div>
+            
+            <div className="flex items-center justify-between mt-1.5 text-[8px] sm:text-[9px] min-w-0 leading-none">
+              <span className="text-slate-500 truncate max-w-[80%]">{node.role}</span>
+              <span className={`h-1.5 w-1.5 rounded-full border border-black/40 shrink-0 ${
+                contained && node.status !== "noisy" ? "bg-emerald-400 shadow-md shadow-emerald-500/40" : nodeDot(node.status)
+              }`} />
+            </div>
           </div>
         </div>
       ))}
+
+      {/* Legend bar at the bottom */}
+      <div className="absolute bottom-2 left-3 right-3 flex flex-col sm:flex-row sm:items-center sm:justify-between text-[8px] sm:text-[9px] text-slate-500 border-t border-slate-800/40 pt-1.5 pointer-events-none gap-1 sm:gap-0">
+        <span className="font-mono text-slate-600">Enterprise Network Topology</span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Clean</span>
+          <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> Noisy Queue</span>
+          <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-orange-400" /> Suspicious</span>
+          <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" /> Compromised</span>
+          <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-ping" /> Critical Alert</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1369,20 +1444,20 @@ function borderBySeverity(severity: Severity) {
 
 function nodeStyle(status: AttackScenario["topology"]["nodes"][number]["status"]) {
   return {
-    clean: "bg-slate-900 border-slate-700",
-    noisy: "bg-amber-950/40 border-amber-500/40",
-    suspicious: "bg-orange-950/40 border-orange-500/40",
-    compromised: "bg-red-950/50 border-red-500/50",
-    critical: "bg-red-950 border-red-400 shadow-red-500/20",
+    clean: "bg-slate-950/80 border-slate-850 hover:border-slate-750",
+    noisy: "bg-amber-950/30 border-amber-500/30 shadow-amber-500/5",
+    suspicious: "bg-orange-950/30 border-orange-500/30 shadow-orange-500/5",
+    compromised: "bg-red-950/40 border-red-500/40 shadow-red-500/10",
+    critical: "bg-red-950/90 border-red-500 shadow-lg shadow-red-500/20",
   }[status];
 }
 
 function nodeDot(status: AttackScenario["topology"]["nodes"][number]["status"]) {
   return {
-    clean: "bg-emerald-400",
-    noisy: "bg-amber-400",
-    suspicious: "bg-orange-400",
-    compromised: "bg-red-500 animate-pulse",
-    critical: "bg-red-400 animate-ping",
+    clean: "bg-emerald-500 shadow-sm shadow-emerald-500/30",
+    noisy: "bg-amber-400 shadow-sm shadow-amber-400/30",
+    suspicious: "bg-orange-400 shadow-sm shadow-orange-400/30",
+    compromised: "bg-red-500 animate-pulse shadow-md shadow-red-500/40",
+    critical: "bg-red-400 animate-ping shadow-lg shadow-red-500/50",
   }[status];
 }
