@@ -53,9 +53,10 @@ export default function AlertRow({
           {alert.severity.slice(0, 4)}
         </span>
         <span className="flex-1 truncate text-slate-100 text-[10px] sm:text-xs">
-          {alert.isAttack && <span className="text-red-300 mr-0.5 font-bold">ATK</span>}
-          {alert.isFalsePositive && <span className="text-amber-300 mr-0.5">FP?</span>}
-          {alert.rule}
+          {alert.isAttack && <span className="text-red-400 mr-1 font-bold animate-pulse">▲ ATK</span>}
+          {alert.isFalsePositive && <span className="text-amber-400 mr-1 font-bold">✕ FP</span>}
+          <span className="text-slate-400 font-extrabold mr-1.5 uppercase text-[8px] sm:text-[9px] tracking-wider bg-slate-950 px-1.5 py-0.5 rounded border border-slate-850">{alert.source}</span>
+          <span className="text-slate-200">{alert.rule}</span>
         </span>
         <span className="text-slate-500 text-[9px] sm:text-[11px] shrink-0">{alert.time.slice(0, 5)}</span>
       </div>

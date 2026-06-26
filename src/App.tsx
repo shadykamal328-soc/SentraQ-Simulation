@@ -485,7 +485,35 @@ export default function App() {
 
       <header className="border-b border-slate-800/60 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Sentraq Logo" className="h-5 sm:h-5.5 w-auto object-contain shrink-0" />
+          <div className="relative h-8 w-8 flex items-center justify-center shrink-0 select-none">
+            {/* Glowing gradient blur behind the logo */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-emerald-400 rounded-lg opacity-30 blur-[3px]" />
+            
+            {/* High-tech Cybersecurity Shield SVG */}
+            <svg className="relative h-7 w-7" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#06b6d4" />
+                  <stop offset="50%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M16 3L27 8.5v8c0 6.075-4.925 11-11 11S5 22.575 5 16.5v-8L16 3z"
+                stroke="url(#logo-grad)"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+                fill="#020617"
+              />
+              <circle cx="16" cy="15" r="3.5" fill="#06b6d4" opacity="0.8" />
+              <path
+                d="M11 15h10M16 10v10"
+                stroke="#10b981"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
           <div className="min-w-0">
             <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
             <p className="text-[11px] sm:text-xs text-slate-500 truncate">Real-time attack simulation platform</p>
@@ -673,30 +701,37 @@ export default function App() {
 
         {/* ── Row 4: Attack Simulations ─ 3 cards full width ── */}
         <section className="col-span-2 attack-simulations border border-slate-800/60 bg-gradient-to-b from-slate-900 to-slate-950 rounded-lg p-3 sm:p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 border-b border-slate-850 pb-2">
             <h2 className="text-xs sm:text-sm uppercase tracking-wider text-slate-400 font-bold">Attack Simulations</h2>
-            <span className="text-[10px] sm:text-[11px] text-cyan-400 font-mono">{FEATURED_ATTACK_SCENARIOS.length} ready</span>
+            <span className="text-[10px] sm:text-[11px] text-cyan-400 font-mono">{FEATURED_ATTACK_SCENARIOS.length} scenarios ready</span>
           </div>
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
             {FEATURED_ATTACK_SCENARIOS.map((item) => (
               <div
                 key={item.id}
                 onClick={() => selectScenario(item)}
-                className={`rounded-lg border p-2 sm:p-4 transition cursor-pointer hover:shadow-lg ${
+                className={`rounded-lg border p-2.5 sm:p-4 transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-[1.015] active:scale-[0.99] flex flex-col justify-between ${
                   item.id === scenario.id
-                    ? "border-cyan-500/50 bg-cyan-500/10 shadow-cyan-500/10"
-                    : "border-slate-700/50 bg-slate-800/40 hover:border-slate-600"
+                    ? "border-cyan-500 bg-cyan-950/15 shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-500/25"
+                    : "border-slate-850 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/60"
                 }`}
               >
-                <div className="text-[11px] sm:text-sm font-bold text-white truncate">{item.shortName}</div>
-                <p className="mt-1 text-[9px] sm:text-[11px] leading-snug text-slate-400 line-clamp-2">{item.summary}</p>
-                <div className="mt-2 sm:mt-3 flex flex-col gap-1 sm:gap-1.5">
+                <div>
+                  <div className="flex items-center gap-2 mb-2 min-w-0">
+                    <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-slate-950 border border-slate-850 shadow-inner">
+                      {getScenarioIcon(item.id)}
+                    </div>
+                    <div className="text-[11px] sm:text-sm font-bold text-white truncate flex-1 leading-none">{item.shortName}</div>
+                  </div>
+                  <p className="text-[9px] sm:text-[11px] leading-snug text-slate-400 line-clamp-2 mb-3">{item.summary}</p>
+                </div>
+                <div className="mt-auto flex flex-col gap-1.5">
                   <button
                     onClick={(event) => {
                       event.stopPropagation();
                       resetSimulation(item, "manual");
                     }}
-                    className="min-h-[30px] sm:min-h-9 w-full rounded-md border border-amber-500/30 bg-amber-500/8 px-2 py-1 text-[9px] sm:text-[11px] font-bold text-amber-400 hover:bg-amber-500/15 transition"
+                    className="min-h-[30px] sm:min-h-9 w-full rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[9px] sm:text-[11px] font-bold text-amber-400 hover:bg-amber-500/20 hover:border-amber-400 active:scale-95 transition-all duration-150 shrink-0"
                   >
                     ▶ Without Sentraq
                   </button>
@@ -705,7 +740,7 @@ export default function App() {
                       event.stopPropagation();
                       resetSimulation(item, "sentraq");
                     }}
-                    className="min-h-[30px] sm:min-h-9 w-full rounded-md border border-emerald-500/30 bg-emerald-500/8 px-2 py-1 text-[9px] sm:text-[11px] font-bold text-emerald-400 hover:bg-emerald-500/15 transition"
+                    className="min-h-[30px] sm:min-h-9 w-full rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[9px] sm:text-[11px] font-bold text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-400 active:scale-95 transition-all duration-150 shrink-0"
                   >
                     ▶ With Sentraq
                   </button>
@@ -1460,4 +1495,55 @@ function nodeDot(status: AttackScenario["topology"]["nodes"][number]["status"]) 
     compromised: "bg-red-500 animate-pulse shadow-md shadow-red-500/40",
     critical: "bg-red-400 animate-ping shadow-lg shadow-red-500/50",
   }[status];
+}
+
+function getScenarioIcon(id: string) {
+  const normId = id.toLowerCase();
+  if (normId.includes("ransomware")) {
+    return (
+      <svg className="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    );
+  }
+  if (normId.includes("stuffing") || normId.includes("credential")) {
+    return (
+      <svg className="w-4 h-4 text-sky-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m-2 4a2 2 0 012 2m-8-10a3 3 0 00-3 3v1a3 3 0 003 3h10a3 3 0 003-3v-1a3 3 0 00-3-3H7zM3 19h18" />
+      </svg>
+    );
+  }
+  if (normId.includes("supply") || normId.includes("backdoor")) {
+    return (
+      <svg className="w-4 h-4 text-purple-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+    );
+  }
+  if (normId.includes("ddos") || normId.includes("flood")) {
+    return (
+      <svg className="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    );
+  }
+  if (normId.includes("exfil")) {
+    return (
+      <svg className="w-4 h-4 text-pink-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+    );
+  }
+  if (normId.includes("lateral") || normId.includes("movement") || normId.includes("ad")) {
+    return (
+      <svg className="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4-4m-4 4l4 4" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  );
 }
