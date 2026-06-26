@@ -485,7 +485,7 @@ export default function App() {
 
       <header className="border-b border-slate-800/60 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Sentraq Logo" className="h-10 w-auto object-contain shrink-0" />
+          <img src="/logo.png" alt="Sentraq Logo" className="h-5 sm:h-5.5 w-auto object-contain shrink-0" />
           <div className="min-w-0">
             <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
             <p className="text-[11px] sm:text-xs text-slate-500 truncate">Real-time attack simulation platform</p>
