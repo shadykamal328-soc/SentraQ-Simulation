@@ -453,17 +453,26 @@ export default function App() {
       audioCtxRef.current = ctx;
       if (ctx.state === "suspended") void ctx.resume();
 
-      const oscillator = ctx.createOscillator();
+      // High-fidelity alarm siren
+      const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(mode === "sentraq" ? 620 : 440, ctx.currentTime);
+      
+      // Use triangle waveform for a clearer alert tone
+      osc.type = "triangle";
+      
+      // Frequency sweep (whee-woo warning effect)
+      osc.frequency.setValueAtTime(mode === "sentraq" ? 580 : 720, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(mode === "sentraq" ? 780 : 960, ctx.currentTime + 0.15);
+      osc.frequency.linearRampToValueAtTime(mode === "sentraq" ? 580 : 720, ctx.currentTime + 0.3);
+      
       gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(mode === "sentraq" ? 0.035 : 0.06, ctx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
-      oscillator.connect(gain);
+      gain.gain.linearRampToValueAtTime(mode === "sentraq" ? 0.02 : 0.045, ctx.currentTime + 0.05);
+      gain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.28);
+      
+      osc.connect(gain);
       gain.connect(ctx.destination);
-      oscillator.start();
-      oscillator.stop(ctx.currentTime + 0.2);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
     };
 
     playPulse();
@@ -568,7 +577,28 @@ export default function App() {
             </svg>
           </div>
           <div className="min-w-0">
-            <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
+              <button
+                onClick={() => setSoundMuted(!soundMuted)}
+                className={`h-6 w-6 rounded-md border transition-all duration-200 flex items-center justify-center shrink-0 ${
+                  soundMuted
+                    ? "border-slate-800 bg-slate-900/60 text-slate-500 hover:bg-slate-800 hover:text-slate-400"
+                    : "border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 shadow-md shadow-cyan-500/5"
+                }`}
+                title={soundMuted ? "Unmute alarm" : "Mute alarm"}
+              >
+                {soundMuted ? (
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25M3 9.75h3.182c.453 0 .89-.18 1.21-.502L11.25 5.37v13.26l-3.858-3.878A1.714 1.714 0 006.182 14.25H3v-4.5z" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                  </svg>
+                )}
+              </button>
+            </div>
             <p className="text-[11px] sm:text-xs text-slate-500 truncate">Real-time attack simulation platform</p>
           </div>
         </div>
@@ -615,16 +645,6 @@ export default function App() {
             }`}>
               {mode === "sentraq" ? "SENTRAQ AI" : "HUMAN L1"}
             </div>
-            <button
-              onClick={() => setSoundMuted(!soundMuted)}
-              className={`h-9 sm:h-10 rounded-lg border px-3 py-1.5 font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 ${
-                soundMuted
-                  ? "border-slate-800 bg-slate-900/60 text-slate-500 hover:bg-slate-800"
-                  : "border-cyan-500/40 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 shadow-lg shadow-cyan-500/5"
-              }`}
-            >
-              {soundMuted ? "🔊 Audio: OFF" : "🔊 Audio: ON"}
-            </button>
             <button
               onClick={() => resetSimulation(scenario, mode)}
               className="h-9 sm:h-10 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-1.5 font-semibold text-white text-xs sm:text-sm hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 transition-all"
