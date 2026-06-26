@@ -86,11 +86,67 @@ function timelineLabel(index: number, total: number) {
   return `T+00:${String(seconds).padStart(2, "0")}`;
 }
 
-function analystThoughtFor(log: AttackLog | undefined, scenario: AttackScenario) {
-  if (!log) return `Starting L1 triage for ${scenario.shortName}. Waiting for first signal.`;
-  if (log.severity === "critical") return `Critical evidence from ${log.source}. I need to validate impact before escalation.`;
-  if (log.severity === "high") return `High-risk signal from ${log.source}. Correlating it with the current case.`;
-  return `Reviewing ${log.source} telemetry to decide if this is noise or part of the attack chain.`;
+function getAnalystThought(log: AttackLog | undefined, scenario: AttackScenario, mode: SimulationMode) {
+  if (!log) {
+    if (mode === "sentraq") {
+      return `Virtual L1 is monitoring. Analyzing logs for ${scenario.shortName}...`;
+    } else {
+      return `Starting L1 triage for ${scenario.shortName}. Monitoring queues...`;
+    }
+  }
+
+  const msg = log.message.toLowerCase();
+  
+  if (mode === "sentraq") {
+    if (msg.includes("delivered") || msg.includes("received") || msg.includes("ingress") || msg.includes("recon")) {
+      return `Clustering incoming indicators for ${scenario.shortName}. Normalizing logs.`;
+    }
+    if (msg.includes("spawned") || msg.includes("token") || msg.includes("login") || msg.includes("auth")) {
+      return `AI detected credential abuse. Cross-referencing sign-in token with user profile.`;
+    }
+    if (msg.includes("psexec") || msg.includes("smb") || msg.includes("outbound") || msg.includes("forward")) {
+      return `Correlating lateral movement. Internal SMB scan is linked to the active case.`;
+    }
+    if (msg.includes("vssadmin") || msg.includes("delete") || msg.includes("exfil") || msg.includes("download") || msg.includes("backlog")) {
+      return `Critical threat detected! Auto-generating response playbook to isolate targets.`;
+    }
+    return `Virtual L1 normalized ${log.source} telemetry and appended it to the current case.`;
+  } else {
+    if (msg.includes("delivered") || msg.includes("received")) {
+      return `Just an email delivery log from ${log.source}. Is it a phishing attempt? I should check later.`;
+    }
+    if (msg.includes("spawned") || msg.includes("rundll32")) {
+      return `EDR says process spawned powershell.exe? Let me Google if this is a Teams false positive...`;
+    }
+    if (msg.includes("proxy") || msg.includes("connect")) {
+      return `Connection to external IP from ${log.source}. Looks like standard telemetry traffic, probably fine.`;
+    }
+    if (msg.includes("token") || msg.includes("login") || msg.includes("auth")) {
+      return `Privileged token requested? Let me open a ticket to ask the backup team if this is theirs.`;
+    }
+    if (msg.includes("smb") || msg.includes("scan") || msg.includes("fan-out")) {
+      return `High volume of SMB sessions... Maybe someone is copying files? Queue is filling up, I'm stressed.`;
+    }
+    if (msg.includes("vssadmin") || msg.includes("delete") || msg.includes("shadows")) {
+      return `Wait, shadow copies deleted on SRV-FILE02?! That's a ransomware behavior! Let me double check...`;
+    }
+    if (msg.includes("failed") || msg.includes("spray")) {
+      return `Thousands of failed sign-ins from different IPs. Credential stuffing? I'll review after this ticket.`;
+    }
+    if (msg.includes("oauth") || msg.includes("consent")) {
+      return `An OAuth app was granted Files.Read? That's weird, but I have 40 other alerts in queue.`;
+    }
+    if (msg.includes("download") || msg.includes("exfil")) {
+      return `Large SharePoint download. Is the user exfiltrating data, or just archiving their projects?`;
+    }
+    if (msg.includes("psexec") || msg.includes("remote")) {
+      return `PsExec service created... This is extremely suspicious. Oh no, systems are starting to encrypt!`;
+    }
+    if (msg.includes("backlog") || msg.includes("latenc") || msg.includes("availability")) {
+      return `WAF and load balancer are saturating. The app is down! I'm drowning in alerts right now!`;
+    }
+    return `Reviewing ${log.source} logs... There are so many similar alerts, it's hard to tell what's real.`;
+  }
 }
 
 function recommendationsFor(scenario: AttackScenario) {
@@ -340,15 +396,11 @@ export default function App() {
         .map((_, stage) => makeAttackAlert(9000 + stage, scenario, Math.round(stage * step), mode))
         .reverse(),
     );
-  }, [hasStarted, elapsed, scenario, mode]);
-
-  useEffect(() => {
-    if (!hasStarted || attackTriggered) return;
-    const interval = setInterval(() => {
-      setThought(mode === "sentraq" ? pick(VIRTUAL_L1_THOUGHTS) : analystThoughtFor(activeLogs.at(-1), scenario));
-    }, 2400);
-    return () => clearInterval(interval);
-  }, [hasStarted, attackTriggered, mode, activeLogs, scenario]);
+    if (!attackTriggered) {
+      const latestLog = visibleLogs.at(-1);
+      setThought(getAnalystThought(latestLog, scenario, mode));
+    }
+  }, [hasStarted, elapsed, scenario, mode, attackTriggered]);
 
   useEffect(() => {
     if (!hasStarted || attackTriggered) return;
@@ -384,7 +436,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    const shouldPlay = hasStarted && running && !attackTriggered && !soundMuted;
+    const shouldPlay = hasStarted && running && !soundMuted;
 
     if (!shouldPlay) {
       if (soundTimerRef.current) {
@@ -406,7 +458,7 @@ export default function App() {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(mode === "sentraq" ? 620 : 440, ctx.currentTime);
       gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(mode === "sentraq" ? 0.035 : 0.05, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(mode === "sentraq" ? 0.035 : 0.06, ctx.currentTime + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
       oscillator.connect(gain);
       gain.connect(ctx.destination);
@@ -415,7 +467,7 @@ export default function App() {
     };
 
     playPulse();
-    soundTimerRef.current = window.setInterval(playPulse, mode === "sentraq" ? 1400 : 1000);
+    soundTimerRef.current = window.setInterval(playPulse, mode === "sentraq" ? 1400 : 700);
 
     return () => {
       if (soundTimerRef.current) {
@@ -423,7 +475,7 @@ export default function App() {
         soundTimerRef.current = null;
       }
     };
-  }, [hasStarted, running, attackTriggered, soundMuted, mode]);
+  }, [hasStarted, running, soundMuted, mode]);
 
   const selectScenario = (nextScenario: AttackScenario) => {
     setScenario(nextScenario);
@@ -478,6 +530,7 @@ export default function App() {
       <style>{`
         @keyframes slideIn { from { transform: translateX(-24px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideDown { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #10151f; }
         ::-webkit-scrollbar-thumb { background: #42526a; border-radius: 8px; }
@@ -521,8 +574,8 @@ export default function App() {
         </div>
 
         <div className="flex flex-col gap-2.5 md:items-end w-full md:w-auto">
-          {/* Simulation status inline row */}
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+          {/* Row 1: Simulation status + Containment/Impact Pill */}
+          <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-300">
             <span className="font-semibold text-slate-400">Simulation:</span>
             <span className="font-bold text-white bg-slate-900 px-2 py-0.5 rounded border border-slate-800">{scenario.name}</span>
             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
@@ -533,6 +586,8 @@ export default function App() {
               {mode === "sentraq" ? "With Sentraq" : "Without Sentraq"}
             </span>
             <span className="text-slate-600 hidden sm:inline">•</span>
+            
+            {/* Ready status tag */}
             <div className="flex items-center gap-1.5 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">
               <span className={`h-2 w-2 rounded-full ${
                 executionStatus === "contained" ? "bg-emerald-500 animate-pulse" :
@@ -541,14 +596,17 @@ export default function App() {
               }`} />
               <span className="capitalize text-slate-300 font-medium font-mono text-[10px]">{executionStatus}</span>
             </div>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-sm">
+            {/* Impact/Containment pill next to the ready status */}
             <StatusPill
               label={mode === "sentraq" ? "Containment" : "Impact"}
               value={`${timeLeft}s`}
               severity={timeLeft <= 7 ? (mode === "sentraq" ? "low" : "critical") : "medium"}
             />
+          </div>
+
+          {/* Row 2: Rate Pill + SENTRAQ AI/HUMAN L1 badge + Restart */}
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-sm md:justify-end">
             <StatusPill label="Rate" value={`${rate}/s`} severity="low" />
             <div className={`h-9 sm:h-10 flex items-center rounded-lg border px-3 py-1.5 font-bold text-xs sm:text-sm ${
               mode === "sentraq"
@@ -557,6 +615,16 @@ export default function App() {
             }`}>
               {mode === "sentraq" ? "SENTRAQ AI" : "HUMAN L1"}
             </div>
+            <button
+              onClick={() => setSoundMuted(!soundMuted)}
+              className={`h-9 sm:h-10 rounded-lg border px-3 py-1.5 font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 ${
+                soundMuted
+                  ? "border-slate-800 bg-slate-900/60 text-slate-500 hover:bg-slate-800"
+                  : "border-cyan-500/40 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 shadow-lg shadow-cyan-500/5"
+              }`}
+            >
+              {soundMuted ? "🔊 Audio: OFF" : "🔊 Audio: ON"}
+            </button>
             <button
               onClick={() => resetSimulation(scenario, mode)}
               className="h-9 sm:h-10 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-1.5 font-semibold text-white text-xs sm:text-sm hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 transition-all"
@@ -660,7 +728,7 @@ export default function App() {
           <h2 className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold relative z-10">
             {mode === "sentraq" ? "Virtual L1 AI workstation" : "SOC Tier 1 analyst workstation"}
           </h2>
-          <div className="flex-1 flex items-center justify-center relative z-10 scale-[0.55] sm:scale-[0.72] origin-center">
+          <div className="flex-1 flex items-center justify-center relative z-10 scale-[0.78] sm:scale-[0.98] origin-center">
             <Analyst state={analystState} thought={thought} stressLevel={stress} />
           </div>
         </section>

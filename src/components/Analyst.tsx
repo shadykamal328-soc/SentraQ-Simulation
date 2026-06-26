@@ -16,9 +16,9 @@ export default function Analyst({ state, thought, stressLevel }: Props) {
     <div className="relative flex flex-col items-center justify-center h-full w-full pt-8">
       {/* Thought bubble */}
       {thought && (
-        <div className="absolute top-0 left-2 right-2 z-10">
-          <div className="rounded-md border border-slate-700 bg-slate-950/95 px-3 py-2 text-[11px] leading-snug font-medium text-slate-100 shadow-xl">
-            <span className="mr-1">💭</span>
+        <div key={thought} className="absolute top-0 left-2 right-2 z-10 animate-[slideDown_0.25s_ease-out]">
+          <div className="rounded-md border border-slate-800 bg-slate-950/95 px-3 py-2 text-[11px] leading-snug font-medium text-slate-100 shadow-xl border-l-2 border-l-cyan-500">
+            <span className="mr-1 text-cyan-400">💭</span>
             {thought}
           </div>
         </div>
