@@ -307,12 +307,9 @@ export default function App() {
   const [activeLogs, setActiveLogs] = useState<AttackLog[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
-  const [soundMuted, setSoundMuted] = useState(false);
   const [expandedScenario, setExpandedScenario] = useState<string | null>(null);
   const idRef = useRef(1000);
   const listRef = useRef<HTMLDivElement>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const soundTimerRef = useRef<number | null>(null);
   const falsePositiveSeeded = useRef(false);
 
   const displayAlerts = useMemo(() => [...attackAlerts, ...alerts].slice(0, MAX_ALERTS), [attackAlerts, alerts]);
@@ -320,11 +317,9 @@ export default function App() {
   const stress = mode === "sentraq"
     ? Math.min(48, 14 + displayAlerts.length * 0.08 + elapsed * 0.45)
     : Math.min(100, 18 + (elapsed / TOTAL_DURATION) * 92 + displayAlerts.length * 0.25);
-  const timeLeft = Math.max(0, effectiveEndAt - elapsed);
   const attackProgress = Math.min(100, (elapsed / ATTACK_AT) * 100);
   const sentraqProgress = Math.min(100, (elapsed / SENTRAQ_CONTAIN_AT) * 100);
   const sentraqContained = mode === "sentraq" && elapsed >= SENTRAQ_CONTAIN_AT;
-  const rate = elapsed > 0 ? ((idRef.current - 1000) / elapsed).toFixed(1) : "0";
   const executionStatus = !hasStarted
     ? "ready"
     : attackTriggered || sentraqContained
@@ -426,65 +421,7 @@ export default function App() {
     if (listRef.current) listRef.current.scrollTop = 0;
   }, [displayAlerts.length]);
 
-  const unlockAudio = () => {
-    if (soundMuted) return;
-    const AudioCtor = window.AudioContext;
-    if (!AudioCtor) return;
-    const ctx = audioCtxRef.current ?? new AudioCtor();
-    audioCtxRef.current = ctx;
-    if (ctx.state === "suspended") void ctx.resume();
-  };
-
-  useEffect(() => {
-    const shouldPlay = hasStarted && running && !soundMuted;
-
-    if (!shouldPlay) {
-      if (soundTimerRef.current) {
-        window.clearInterval(soundTimerRef.current);
-        soundTimerRef.current = null;
-      }
-      return;
-    }
-
-    const playPulse = () => {
-      const AudioCtor = window.AudioContext;
-      if (!AudioCtor) return;
-      const ctx = audioCtxRef.current ?? new AudioCtor();
-      audioCtxRef.current = ctx;
-      if (ctx.state === "suspended") void ctx.resume();
-
-      // High-fidelity alarm siren
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      // Use triangle waveform for a clearer alert tone
-      osc.type = "triangle";
-      
-      // Frequency sweep (whee-woo warning effect)
-      osc.frequency.setValueAtTime(mode === "sentraq" ? 580 : 720, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(mode === "sentraq" ? 780 : 960, ctx.currentTime + 0.15);
-      osc.frequency.linearRampToValueAtTime(mode === "sentraq" ? 580 : 720, ctx.currentTime + 0.3);
-      
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(mode === "sentraq" ? 0.02 : 0.045, ctx.currentTime + 0.05);
-      gain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.28);
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.3);
-    };
-
-    playPulse();
-    soundTimerRef.current = window.setInterval(playPulse, mode === "sentraq" ? 1400 : 700);
-
-    return () => {
-      if (soundTimerRef.current) {
-        window.clearInterval(soundTimerRef.current);
-        soundTimerRef.current = null;
-      }
-    };
-  }, [hasStarted, running, soundMuted, mode]);
+  // Audio system completely removed
 
   const selectScenario = (nextScenario: AttackScenario) => {
     setScenario(nextScenario);
@@ -508,7 +445,6 @@ export default function App() {
   };
 
   const resetSimulation = (nextScenario = scenario, nextMode = mode) => {
-    unlockAudio();
     setScenario(nextScenario);
     setMode(nextMode);
     setAlerts([]);
@@ -545,14 +481,14 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: #42526a; border-radius: 8px; }
       `}</style>
 
-      <header className="border-b border-slate-800/60 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative h-8 w-8 flex items-center justify-center shrink-0 select-none">
+      <header className="border-b border-slate-800/60 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-2.5 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-2">
+          <div className="relative h-6 w-6 flex items-center justify-center shrink-0 select-none">
             {/* Glowing gradient blur behind the logo */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-emerald-400 rounded-lg opacity-30 blur-[3px]" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-emerald-400 rounded-lg opacity-30 blur-[2px]" />
             
             {/* High-tech Cybersecurity Shield SVG */}
-            <svg className="relative h-7 w-7" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="relative h-5 w-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#06b6d4" />
@@ -577,38 +513,17 @@ export default function App() {
             </svg>
           </div>
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
-              <button
-                onClick={() => setSoundMuted(!soundMuted)}
-                className={`h-6 w-6 rounded-md border transition-all duration-200 flex items-center justify-center shrink-0 ${
-                  soundMuted
-                    ? "border-slate-800 bg-slate-900/60 text-slate-500 hover:bg-slate-800 hover:text-slate-400"
-                    : "border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 shadow-md shadow-cyan-500/5"
-                }`}
-                title={soundMuted ? "Unmute alarm" : "Mute alarm"}
-              >
-                {soundMuted ? (
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25M3 9.75h3.182c.453 0 .89-.18 1.21-.502L11.25 5.37v13.26l-3.858-3.878A1.714 1.714 0 006.182 14.25H3v-4.5z" />
-                  </svg>
-                ) : (
-                  <svg className="w-3.5 h-3.5 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-            <p className="text-[11px] sm:text-xs text-slate-500 truncate">Real-time attack simulation platform</p>
+            <h1 className="text-[11px] sm:text-xs font-black tracking-wider text-white truncate">SOC ATTACK SIMULATOR</h1>
+            <p className="text-[9px] sm:text-[10px] text-slate-500 truncate">Real-time attack simulation platform</p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2.5 md:items-end w-full md:w-auto">
-          {/* Row 1: Simulation status + Containment/Impact Pill */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-300">
+        <div className="flex flex-col gap-1.5 md:items-end w-full md:w-auto">
+          {/* Row 1: Simulation status info */}
+          <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] text-slate-300">
             <span className="font-semibold text-slate-400">Simulation:</span>
-            <span className="font-bold text-white bg-slate-900 px-2 py-0.5 rounded border border-slate-800">{scenario.name}</span>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+            <span className="font-bold text-white bg-slate-900 px-1 py-0.5 rounded border border-slate-800 text-[9px] sm:text-[10px]">{scenario.name}</span>
+            <span className={`px-1 py-0.5 rounded text-[8px] sm:text-[9px] font-bold uppercase tracking-wider ${
               mode === "sentraq"
                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                 : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
@@ -618,27 +533,19 @@ export default function App() {
             <span className="text-slate-600 hidden sm:inline">•</span>
             
             {/* Ready status tag */}
-            <div className="flex items-center gap-1.5 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-800">
-              <span className={`h-2 w-2 rounded-full ${
+            <div className="flex items-center gap-1 bg-slate-900/60 px-1 py-0.5 rounded border border-slate-800">
+              <span className={`h-1 w-1 rounded-full ${
                 executionStatus === "contained" ? "bg-emerald-500 animate-pulse" :
                 executionStatus === "completed" ? "bg-red-500 animate-pulse" :
                 executionStatus === "running" ? "bg-cyan-500 animate-pulse" : "bg-slate-500"
               }`} />
-              <span className="capitalize text-slate-300 font-medium font-mono text-[10px]">{executionStatus}</span>
+              <span className="capitalize text-slate-300 font-medium font-mono text-[8px] sm:text-[9px]">{executionStatus}</span>
             </div>
-
-            {/* Impact/Containment pill next to the ready status */}
-            <StatusPill
-              label={mode === "sentraq" ? "Containment" : "Impact"}
-              value={`${timeLeft}s`}
-              severity={timeLeft <= 7 ? (mode === "sentraq" ? "low" : "critical") : "medium"}
-            />
           </div>
 
-          {/* Row 2: Rate Pill + SENTRAQ AI/HUMAN L1 badge + Restart */}
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-sm md:justify-end">
-            <StatusPill label="Rate" value={`${rate}/s`} severity="low" />
-            <div className={`h-9 sm:h-10 flex items-center rounded-lg border px-3 py-1.5 font-bold text-xs sm:text-sm ${
+          {/* Row 2: SENTRAQ AI/HUMAN L1 badge + Restart */}
+          <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9.5px] md:justify-end">
+            <div className={`h-6.5 sm:h-7 flex items-center rounded-md border px-2 font-bold text-[8px] sm:text-[9.5px] shrink-0 ${
               mode === "sentraq"
                 ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                 : "border-amber-500/30 bg-amber-500/10 text-amber-400"
@@ -647,7 +554,7 @@ export default function App() {
             </div>
             <button
               onClick={() => resetSimulation(scenario, mode)}
-              className="h-9 sm:h-10 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-1.5 font-semibold text-white text-xs sm:text-sm hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/20 transition-all"
+              className="h-6.5 sm:h-7 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 px-2.5 font-semibold text-white text-[8px] sm:text-[9.5px] hover:from-cyan-500 hover:to-blue-500 shadow-md shadow-cyan-500/10 transition-all shrink-0"
             >
               ↻ Restart
             </button>
@@ -895,14 +802,7 @@ export default function App() {
   );
 }
 
-function StatusPill({ label, value, severity }: { label: string; value: string; severity: Severity }) {
-  return (
-    <div className={`flex h-9 sm:h-10 items-center justify-between gap-2.5 rounded-lg border bg-slate-900/60 px-3 py-1.5 shrink-0 ${borderBySeverity(severity)}`}>
-      <span className="text-[10px] sm:text-xs text-slate-500 shrink-0 font-medium">{label}:</span>
-      <span className={`font-mono font-bold text-xs sm:text-sm shrink-0 ${severityText(severity)}`}>{value}</span>
-    </div>
-  );
-}
+
 
 function ReportViewer({
   scenario,
