@@ -30,8 +30,8 @@ export default function InvestigationPanel({
   }, [alert.id]);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-[fadeIn_0.2s]">
-      <div className="w-full max-w-3xl overflow-hidden rounded-2xl border-2 border-slate-700 bg-slate-900 shadow-2xl">
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center bg-black/80 p-0 sm:p-4 backdrop-blur-md animate-[fadeIn_0.2s]">
+      <div className="w-full max-w-3xl max-h-[100dvh] sm:max-h-[92vh] overflow-hidden rounded-t-2xl sm:rounded-2xl border-2 border-slate-700 bg-slate-900 shadow-2xl flex flex-col">
         <div className="flex items-start justify-between gap-3 border-b border-slate-700 bg-gradient-to-r from-slate-800 to-slate-900 px-4 py-4 sm:px-5 sm:py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg">
@@ -52,7 +52,7 @@ export default function InvestigationPanel({
           </button>
         </div>
 
-        <div className="space-y-4 p-4 sm:p-5">
+        <div className="space-y-4 p-4 sm:p-5 flex-1 overflow-y-auto">
           <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <DetailField label="Rule" value={alert.rule} />
             <DetailField label="Category" value={alert.category} />

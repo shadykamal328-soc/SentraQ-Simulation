@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Alert, AnalystState, AttackLog, AttackScenario, Severity } from "./types";
 import {
   ANALYST_THOUGHTS,
@@ -252,6 +252,7 @@ export default function App() {
   const [showReport, setShowReport] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [soundMuted, setSoundMuted] = useState(false);
+  const [expandedScenario, setExpandedScenario] = useState<string | null>(null);
   const idRef = useRef(1000);
   const listRef = useRef<HTMLDivElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -482,60 +483,62 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: #42526a; border-radius: 8px; }
       `}</style>
 
-      <header className="border-b border-slate-800 bg-zinc-950 px-4 py-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <header className="border-b border-slate-800 bg-zinc-950 px-3 py-2 sm:px-4 sm:py-3 flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-md border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center font-black text-cyan-300">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-md border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center font-black text-cyan-300 text-sm sm:text-base shrink-0">
             {mode === "sentraq" ? "AI" : "L1"}
           </div>
-          <div>
-            <h1 className="text-base font-bold tracking-wide text-white">SOC ATTACK SIMULATOR</h1>
-            <p className="text-xs text-slate-400">
-              Manual L1 triage vs Sentraq AI investigation and response
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-base font-bold tracking-wide text-white truncate">SOC ATTACK SIMULATOR</h1>
+            <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+              Manual L1 vs Sentraq AI
             </p>
           </div>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-2 text-sm sm:flex sm:flex-wrap lg:w-auto lg:justify-end">
+        <div className="grid w-full grid-cols-2 gap-1.5 sm:gap-2 text-sm sm:flex sm:flex-wrap lg:w-auto lg:justify-end">
           <StatusPill
-            label={mode === "sentraq" ? "Time to containment" : "Time to impact"}
+            label={mode === "sentraq" ? "Containment" : "Impact"}
             value={`${timeLeft}s`}
             severity={timeLeft <= 7 ? (mode === "sentraq" ? "low" : "critical") : "medium"}
           />
-          <StatusPill label="Alert rate" value={`${rate}/s`} severity="low" />
-          <div className={`min-h-11 break-words rounded-md border px-4 py-3 font-bold ${
+          <StatusPill label="Rate" value={`${rate}/s`} severity="low" />
+          <div className={`min-h-[40px] sm:min-h-11 break-words rounded-md border px-3 py-2 sm:px-4 sm:py-3 font-bold text-xs sm:text-sm ${
             mode === "sentraq"
               ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
               : "border-amber-500/40 bg-amber-500/10 text-amber-300"
           }`}>
-            {mode === "sentraq" ? "WITH SENTRAQ: VIRTUAL L1" : "WITHOUT SENTRAQ: HUMAN L1"}
+            {mode === "sentraq" ? "SENTRAQ AI" : "HUMAN L1"}
           </div>
-          <button
-            onClick={() => setRunning((r) => !r)}
-            disabled={!hasStarted || attackTriggered}
-            className="min-h-11 rounded-md border border-slate-700 bg-slate-900 px-4 py-3 hover:bg-slate-800 disabled:opacity-50"
-          >
-            {running ? "Pause" : "Resume"}
-          </button>
-          <button
-            onClick={() => setSoundMuted((muted) => !muted)}
-            className={`min-h-11 rounded-md border px-4 py-3 font-semibold ${
-              soundMuted
-                ? "border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800"
-                : "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-            }`}
-          >
-            {soundMuted ? "Sound muted" : "Sound on"}
-          </button>
-          <button
-            onClick={() => resetSimulation(scenario, mode)}
-            className="min-h-11 rounded-md bg-cyan-600 px-4 py-3 font-semibold text-white hover:bg-cyan-500"
-          >
-            Restart
-          </button>
+          <div className="col-span-2 grid grid-cols-3 gap-1.5 sm:contents">
+            <button
+              onClick={() => setRunning((r) => !r)}
+              disabled={!hasStarted || attackTriggered}
+              className="min-h-[40px] sm:min-h-11 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm hover:bg-slate-800 disabled:opacity-50"
+            >
+              {running ? "⏸ Pause" : "▶ Resume"}
+            </button>
+            <button
+              onClick={() => setSoundMuted((muted) => !muted)}
+              className={`min-h-[40px] sm:min-h-11 rounded-md border px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm ${
+                soundMuted
+                  ? "border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800"
+                  : "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+              }`}
+            >
+              {soundMuted ? "🔇" : "🔊"}
+            </button>
+            <button
+              onClick={() => resetSimulation(scenario, mode)}
+              className="min-h-[40px] sm:min-h-11 rounded-md bg-cyan-600 px-3 py-2 sm:px-4 sm:py-3 font-semibold text-white text-xs sm:text-sm hover:bg-cyan-500"
+            >
+              Restart
+            </button>
+          </div>
         </div>
       </header>
 
-      <section className={`execution-status mx-4 mt-4 rounded-lg border px-4 py-4 ${
+      <section className={`execution-status mx-3 sm:mx-4 mt-2 sm:mt-4 rounded-lg border px-3 py-3 sm:px-4 sm:py-4 ${
         executionStatus === "contained"
           ? "border-emerald-500/40 bg-emerald-950/20"
           : executionStatus === "completed"
@@ -557,7 +560,7 @@ export default function App() {
             }`}>
               Execution status
             </div>
-            <div className="mt-1 text-sm text-slate-200">
+            <div className="mt-1 text-xs sm:text-sm text-slate-200">
               {executionStatus === "ready" &&
                 `Ready to execute ${scenario.name}. Choose with or without Sentraq.`}
               {executionStatus === "running" &&
@@ -568,7 +571,7 @@ export default function App() {
                 `${scenario.name} executed successfully, and Sentraq contained it before business impact.`}
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono">
             {mode === "sentraq" && sentraqContained && (
               <button
                 onClick={() => setShowReport(true)}
@@ -594,24 +597,24 @@ export default function App() {
         </div>
       </section>
 
-      <div className="dashboard-shell grid grid-cols-1 gap-3 p-4 md:grid-cols-12 md:min-h-[calc(100vh-65px)]">
-        <aside className="flex flex-col gap-3 md:col-span-3 md:min-h-[720px]">
-          <section className={`l1-focus border rounded-lg p-4 ${
+      <div className="dashboard-shell grid grid-cols-3 gap-1 p-1.5 sm:gap-2 sm:p-2 lg:grid-cols-12 lg:gap-3 lg:p-4 lg:min-h-[calc(100vh-65px)]">
+        <aside className="flex flex-col gap-1 sm:gap-2 lg:gap-3 col-span-1 lg:col-span-3 min-w-0">
+          <section className={`l1-focus border rounded-lg p-1.5 sm:p-2 lg:p-4 ${
             mode === "sentraq" ? "border-emerald-500/30 bg-emerald-950/10" : "border-amber-500/30 bg-amber-950/10"
           }`}>
-            <h2 className={`text-xs uppercase tracking-wider font-bold mb-2 ${
+            <h2 className={`text-[9px] sm:text-[10px] lg:text-xs uppercase tracking-wider font-bold mb-1 sm:mb-2 truncate ${
               mode === "sentraq" ? "text-emerald-300" : "text-amber-300"
             }`}>
-              {mode === "sentraq" ? "Sentraq focus and workload" : "L1 focus and workload"}
+              {mode === "sentraq" ? "Sentraq workload" : "L1 workload"}
             </h2>
-            <p className="text-xs text-slate-200 leading-relaxed">
+            <p className="text-[8px] sm:text-[10px] lg:text-xs text-slate-200 leading-snug line-clamp-2 sm:line-clamp-3">
               {mode === "sentraq"
                 ? "AI clusters noisy context, keeps it attached to the case, and prioritizes the real attack chain."
                 : scenario.falsePositiveFocus}
             </p>
 
-            <div className="mt-3">
-              <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div className="mt-1.5 sm:mt-2 lg:mt-3">
+              <div className="h-1 sm:h-1.5 lg:h-2 bg-slate-800 rounded-full overflow-hidden">
                 <div
                   className={`h-full transition-all duration-500 ${
                     stress > 75 ? "bg-red-500" : stress > 50 ? "bg-amber-400" : "bg-emerald-400"
@@ -619,20 +622,20 @@ export default function App() {
                   style={{ width: `${stress}%` }}
                 />
               </div>
-              <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-400">
-                <span>{Math.round(stress)}% workload</span>
-                <span>{displayAlerts.length} pending alerts</span>
+              <div className="mt-0.5 sm:mt-1 lg:mt-1.5 flex items-center justify-between text-[7px] sm:text-[9px] lg:text-[11px] text-slate-400">
+                <span>{Math.round(stress)}%</span>
+                <span>{displayAlerts.length} alerts</span>
               </div>
             </div>
 
-            <div className="mt-3 grid grid-cols-4 gap-1.5 text-xs">
+            <div className="mt-1 sm:mt-2 lg:mt-3 grid grid-cols-2 sm:grid-cols-4 gap-0.5 sm:gap-1 lg:gap-1.5 text-xs">
               <CompactMetric label="Rev" value={reviewed} />
               <CompactMetric label={mode === "sentraq" ? "Clus" : "Miss"} value={mode === "sentraq" ? displayAlerts.length : missed} danger={mode === "manual"} />
               <CompactMetric label="Atk" value={counts.attack} danger={mode === "manual"} />
               <CompactMetric label="FP" value={counts.falsePositive} />
             </div>
 
-            <div className="mt-2 grid grid-cols-4 gap-1.5">
+            <div className="mt-1 sm:mt-1.5 lg:mt-2 grid grid-cols-2 sm:grid-cols-4 gap-0.5 sm:gap-1 lg:gap-1.5">
               <SeverityTile label="Crit" value={counts.critical} color="text-red-300" />
               <SeverityTile label="High" value={counts.high} color="text-orange-300" />
               <SeverityTile label="Med" value={counts.medium} color="text-amber-300" />
@@ -640,28 +643,36 @@ export default function App() {
             </div>
           </section>
 
-          <section className="attack-simulations border border-slate-800 bg-slate-950 rounded-lg p-4 h-[300px]">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold">Attack simulations</h2>
-              <span className="text-[11px] text-cyan-300 font-mono">{FEATURED_ATTACK_SCENARIOS.length} ready</span>
+          <section className="attack-simulations border border-slate-800 bg-slate-950 rounded-lg p-1.5 sm:p-3 lg:p-4 lg:h-[300px]">
+            <div className="flex items-center justify-between mb-1 sm:mb-2 lg:mb-3">
+              <h2 className="text-[9px] sm:text-[10px] lg:text-xs uppercase tracking-wider text-slate-400 font-bold">Simulations</h2>
+              <span className="text-[8px] sm:text-[10px] lg:text-[11px] text-cyan-300 font-mono">{FEATURED_ATTACK_SCENARIOS.length}</span>
             </div>
-            <div className="space-y-2 h-[240px] overflow-y-auto pr-1">
-              {FEATURED_ATTACK_SCENARIOS.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => selectScenario(item)}
-                  className={`w-full rounded-md border px-4 py-4 transition ${
-                    item.id === scenario.id
-                      ? "border-cyan-500/60 bg-cyan-500/10"
-                      : "border-slate-800 bg-slate-900 hover:border-slate-600"
-                  }`}
-                >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-bold text-white truncate">{item.shortName}</div>
-                      <p className="mt-0.5 text-[11px] leading-snug text-slate-400 line-clamp-2">{item.summary}</p>
+            <div className="space-y-1 sm:space-y-2 lg:h-[240px] overflow-y-auto">
+              {FEATURED_ATTACK_SCENARIOS.map((item) => {
+                const isExpanded = expandedScenario === item.id;
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      if (window.innerWidth < 1024) {
+                        setExpandedScenario(isExpanded ? null : item.id);
+                      } else {
+                        selectScenario(item);
+                      }
+                    }}
+                    className={`w-full rounded-md border px-1.5 py-1.5 sm:px-3 sm:py-3 lg:px-4 lg:py-4 transition cursor-pointer ${
+                      item.id === scenario.id
+                        ? "border-cyan-500/60 bg-cyan-500/10"
+                        : "border-slate-800 bg-slate-900 hover:border-slate-600"
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <div className="text-[10px] sm:text-xs lg:text-sm font-bold text-white truncate">{item.shortName}</div>
+                      <p className="mt-0.5 text-[8px] sm:text-[10px] lg:text-[11px] leading-snug text-slate-400 line-clamp-1 sm:line-clamp-2">{item.summary}</p>
                     </div>
-                    <div className="attack-actions flex w-full shrink-0 flex-col gap-2 sm:w-28">
+                    {/* Desktop lg: always show buttons */}
+                    <div className="attack-actions hidden lg:flex w-full shrink-0 flex-col gap-2 mt-2">
                       <button
                         onClick={(event) => {
                           event.stopPropagation();
@@ -681,25 +692,48 @@ export default function App() {
                         Execute with Sentraq
                       </button>
                     </div>
+                    {/* Mobile/tablet accordion: buttons appear when expanded */}
+                    {isExpanded && (
+                      <div className="mt-1.5 sm:mt-2 flex flex-col gap-1 sm:gap-2 lg:hidden animate-[fadeIn_0.2s]">
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            resetSimulation(item, "manual");
+                          }}
+                          className="min-h-[32px] sm:min-h-[40px] w-full rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 sm:px-3 sm:py-2 text-[9px] sm:text-[11px] font-bold text-amber-300 active:bg-amber-500/30"
+                        >
+                          ▶ Without Sentraq
+                        </button>
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            resetSimulation(item, "sentraq");
+                          }}
+                          className="min-h-[32px] sm:min-h-[40px] w-full rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 sm:px-3 sm:py-2 text-[9px] sm:text-[11px] font-bold text-emerald-300 active:bg-emerald-500/30"
+                        >
+                          ▶ With Sentraq
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 
-          <section className="border border-slate-800 bg-slate-950 rounded-lg p-4 h-[220px]">
-            <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">Attack automation log</h2>
-            <div className="h-full min-h-0 overflow-y-auto rounded-md bg-black/60 border border-slate-800 p-2 font-mono text-xs">
+          <section className="border border-slate-800 bg-slate-950 rounded-lg p-1.5 sm:p-3 lg:p-4 lg:h-[220px]">
+            <h2 className="text-[9px] sm:text-[10px] lg:text-xs uppercase tracking-wider text-slate-400 font-bold mb-1 sm:mb-2">Attack log</h2>
+            <div className="h-full min-h-0 overflow-y-auto rounded-md bg-black/60 border border-slate-800 p-1 sm:p-2 font-mono text-[7px] sm:text-[9px] lg:text-xs max-h-[80px] sm:max-h-[120px] lg:max-h-none">
               {!hasStarted ? (
-                <p className="text-slate-500">Logs will start after executing an attack.</p>
+                <p className="text-slate-500">Waiting...</p>
               ) : activeLogs.length === 0 ? (
-                <p className="text-slate-500">Waiting for first attack-stage telemetry...</p>
+                <p className="text-slate-500">Waiting...</p>
               ) : (
                 activeLogs.map((log, index) => (
-                  <div key={`${log.t}-${log.message}`} className="mb-2">
+                  <div key={`${log.t}-${log.message}`} className="mb-0.5 sm:mb-1 lg:mb-2 truncate">
                     <span className={severityText(log.severity)}>{timelineLabel(index, scenario.attackLogs.length)}</span>
-                    <span className="text-slate-500"> [{log.source}] </span>
-                    <span className="text-slate-300">{log.message}</span>
+                    <span className="text-slate-500 hidden lg:inline"> [{log.source}]</span>
+                    <span className="text-slate-300"> {log.message}</span>
                   </div>
                 ))
               )}
@@ -707,49 +741,48 @@ export default function App() {
           </section>
         </aside>
 
-        <main className="flex flex-col gap-3 md:col-span-6 md:min-h-[720px]">
+        <main className="flex flex-col gap-1 sm:gap-2 lg:gap-3 col-span-1 lg:col-span-6 min-w-0">
           {mode === "sentraq" && sentraqContained && (
-            <section className="sentraq-workflow rounded-lg border border-emerald-500/50 bg-emerald-950/30 px-4 py-4 shadow-lg shadow-emerald-950/30">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-sm font-black uppercase tracking-wider text-emerald-300">
-                    Sentraq detected {scenario.shortName}
+            <section className="sentraq-workflow rounded-lg border border-emerald-500/50 bg-emerald-950/30 px-1.5 py-1.5 sm:px-3 sm:py-3 lg:px-4 lg:py-4 shadow-lg shadow-emerald-950/30">
+              <div className="flex flex-col gap-1 sm:gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <h2 className="text-[9px] sm:text-xs lg:text-sm font-black uppercase tracking-wider text-emerald-300 truncate">
+                    Sentraq: {scenario.shortName}
                   </h2>
-                  <p className="mt-1 text-xs text-slate-200">
-                    AI correlated ELK alerts, enriched indicators with MISP, classified the incident as critical, and generated a response report.
+                  <p className="mt-0.5 text-[8px] sm:text-[10px] lg:text-xs text-slate-200 line-clamp-1 sm:line-clamp-2">
+                    AI correlated alerts, enriched with MISP, classified critical.
                   </p>
                 </div>
                 <button
                   onClick={() => setShowReport(true)}
-                  className="min-h-11 w-full shrink-0 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-4 py-3 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 sm:w-auto"
+                  className="min-h-7 sm:min-h-9 lg:min-h-11 w-full shrink-0 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-[9px] sm:text-[11px] lg:text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 sm:w-auto"
                 >
-                  View report
+                  Report
                 </button>
               </div>
             </section>
           )}
 
-          <section className="live-siem-alerts border border-slate-800 bg-slate-950 rounded-lg overflow-hidden flex flex-col h-[340px] sm:h-[360px] shrink-0">
-            <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-white">Live SIEM Alerts</h2>
-                <p className="text-xs text-slate-500">
-                  {hasStarted ? "Alerts arrive in attack-sequence order with routine noise mixed in." : "Execute an attack to start the live alert stream."}
+          <section className="live-siem-alerts border border-slate-800 bg-slate-950 rounded-lg overflow-hidden flex flex-col h-[180px] sm:h-[300px] lg:h-[360px] shrink-0">
+            <div className="px-1.5 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 border-b border-slate-800 flex items-center justify-between">
+              <div className="min-w-0">
+                <h2 className="text-[9px] sm:text-xs lg:text-sm font-bold uppercase tracking-wider text-white">SIEM Alerts</h2>
+                <p className="text-[7px] sm:text-[10px] lg:text-xs text-slate-500 truncate">
+                  {hasStarted ? "Live stream" : "Execute to start"}
                 </p>
               </div>
-              <div className="text-xs text-slate-400">Click an alert to investigate</div>
             </div>
-            <div className="alerts-header grid grid-cols-2 gap-2 border-b border-slate-800 bg-black/40 px-4 py-3 text-[11px] uppercase tracking-wider text-slate-500 font-bold font-mono sm:grid-cols-12">
-              <span className="col-time sm:col-span-2">Time</span>
-              <span className="col-sig text-center sm:col-span-1">Sig</span>
-              <span className="col-sev sm:col-span-1">Sev</span>
-              <span className="col-rule sm:col-span-4">Rule</span>
-              <span className="col-source sm:col-span-2">Source</span>
-              <span className="col-target sm:col-span-2">Target</span>
+            <div className="alerts-header hidden lg:grid grid-cols-12 gap-2 border-b border-slate-800 bg-black/40 px-4 py-3 text-[11px] uppercase tracking-wider text-slate-500 font-bold font-mono">
+              <span className="col-time col-span-2">Time</span>
+              <span className="col-sig text-center col-span-1">Sig</span>
+              <span className="col-sev col-span-1">Sev</span>
+              <span className="col-rule col-span-4">Rule</span>
+              <span className="col-source col-span-2">Source</span>
+              <span className="col-target col-span-2">Target</span>
             </div>
             <div ref={listRef} className="flex-1 overflow-auto">
               {displayAlerts.length === 0 ? (
-                <div className="p-8 text-center text-sm text-slate-500">No live SIEM alerts yet.</div>
+                <div className="p-3 sm:p-8 text-center text-[9px] sm:text-sm text-slate-500">No alerts yet.</div>
               ) : (
                 displayAlerts.map((alert, index) => (
                   <AlertRow key={alert.id} alert={alert} fresh={index === 0} onClick={() => handleOpen(alert)} />
@@ -758,18 +791,18 @@ export default function App() {
             </div>
           </section>
 
-          <section className="network-topology border border-slate-800 bg-slate-950 rounded-lg p-4 shrink-0">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-white">Network topology</h2>
-                <p className="text-xs text-slate-500">{scenario.blastRadius}</p>
+          <section className="network-topology border border-slate-800 bg-slate-950 rounded-lg p-1.5 sm:p-3 lg:p-4 shrink-0">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <div className="min-w-0">
+                <h2 className="text-[9px] sm:text-xs lg:text-sm font-bold uppercase tracking-wider text-white">Topology</h2>
+                <p className="text-[7px] sm:text-[10px] lg:text-xs text-slate-500 truncate">{scenario.blastRadius}</p>
               </div>
-              <div className="w-full md:max-w-[14rem]">
-                <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
-                  <span>Attack progress</span>
+              <div className="w-full max-w-[4rem] sm:max-w-[8rem] lg:max-w-[14rem]">
+                <div className="flex items-center justify-between text-[7px] sm:text-[9px] lg:text-[11px] text-slate-500 mb-0.5">
+                  <span>Progress</span>
                   <span>{Math.round(attackProgress)}%</span>
                 </div>
-                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-1 sm:h-1.5 lg:h-2 bg-slate-800 rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-500 ${mode === "sentraq" ? "bg-emerald-400" : "bg-red-500"}`}
                     style={{ width: `${mode === "sentraq" ? sentraqProgress : attackProgress}%` }}
@@ -777,37 +810,36 @@ export default function App() {
                 </div>
               </div>
             </div>
-            <p className="topology-hint mt-2 hidden text-[11px] text-slate-500">Swipe to explore →</p>
-            <div className="topology-scroll">
+            <div className="topology-scroll overflow-x-auto">
               <Topology scenario={scenario} progress={mode === "sentraq" ? sentraqProgress : attackProgress} contained={sentraqContained} />
             </div>
             {mode === "sentraq" && hasStarted && (
               <button
                 onClick={() => setShowVideo(true)}
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-emerald-400/40 bg-emerald-500 px-4 py-3 text-center text-sm font-black uppercase tracking-wider text-slate-950 shadow-lg shadow-emerald-950/30 transition hover:bg-emerald-300"
+                className="mt-1 sm:mt-2 lg:mt-3 flex w-full items-center justify-center gap-1 rounded-md border border-emerald-400/40 bg-emerald-500 px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-center text-[8px] sm:text-xs lg:text-sm font-black uppercase tracking-wider text-slate-950 shadow-lg shadow-emerald-950/30 transition hover:bg-emerald-300"
               >
-                <span className="h-2.5 w-2.5 rounded-sm bg-slate-950" />
-                View Sentraq Dashboard
+                <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 lg:h-2.5 lg:w-2.5 rounded-sm bg-slate-950" />
+                Sentraq Demo
               </button>
             )}
           </section>
         </main>
 
-        <aside className="flex flex-col gap-3 md:col-span-3 md:min-h-[720px]">
-          <section className="soc-workstation border border-slate-800 bg-slate-950 rounded-lg p-4 h-[250px] sm:h-[275px] relative overflow-hidden shrink-0">
-            <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold relative z-10">
-              {mode === "sentraq" ? "Virtual L1 AI workstation" : "SOC Tier 1 analyst workstation"}
+        <aside className="flex flex-col gap-1 sm:gap-2 lg:gap-3 col-span-1 lg:col-span-3 min-w-0">
+          <section className="soc-workstation border border-slate-800 bg-slate-950 rounded-lg p-1 sm:p-2 lg:p-4 h-[120px] sm:h-[200px] lg:h-[275px] relative overflow-hidden shrink-0">
+            <h2 className="text-[8px] sm:text-[10px] lg:text-xs uppercase tracking-wider text-slate-400 font-bold relative z-10 truncate">
+              {mode === "sentraq" ? "Virtual L1 AI" : "SOC L1 Analyst"}
             </h2>
-            <div className="h-[210px] sm:h-[230px] flex items-end justify-center relative z-10 scale-[0.62] sm:scale-[0.68] origin-bottom">
+            <div className="h-[95px] sm:h-[165px] lg:h-[230px] flex items-end justify-center relative z-10 scale-[0.3] sm:scale-[0.48] lg:scale-[0.68] origin-bottom">
               <Analyst state={analystState} thought={thought} stressLevel={stress} />
             </div>
           </section>
 
-          <section className="case-notes border border-slate-800 bg-slate-950 rounded-lg p-4">
-            <h2 className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">
-              {mode === "sentraq" ? "Sentraq AI workflow" : "Current case notes"}
+          <section className="case-notes border border-slate-800 bg-slate-950 rounded-lg p-1.5 sm:p-2 lg:p-4">
+            <h2 className="text-[9px] sm:text-[10px] lg:text-xs uppercase tracking-wider text-slate-400 font-bold mb-0.5 sm:mb-1 lg:mb-2 truncate">
+              {mode === "sentraq" ? "Sentraq workflow" : "Case notes"}
             </h2>
-            <div className="rounded-md border border-slate-800 bg-black/60 p-3 font-mono text-xs max-h-[260px] overflow-y-auto">
+            <div className="rounded-md border border-slate-800 bg-black/60 p-1 sm:p-2 lg:p-3 font-mono text-[7px] sm:text-[9px] lg:text-xs max-h-[100px] sm:max-h-[180px] lg:max-h-[260px] overflow-y-auto">
               {mode === "sentraq" ? (
                 <SentraqWorkflow elapsed={elapsed} scenario={scenario} hasStarted={hasStarted} />
               ) : (
@@ -823,6 +855,7 @@ export default function App() {
           </section>
         </aside>
       </div>
+
       {selected && !attackTriggered && <InvestigationPanel alert={selected} onClose={() => setSelected(null)} />}
       {showReport && (
         <ReportViewer
@@ -841,9 +874,9 @@ export default function App() {
 
 function StatusPill({ label, value, severity }: { label: string; value: string; severity: Severity }) {
   return (
-    <div className={`flex min-h-11 min-w-[140px] flex-1 items-center justify-between gap-2 rounded-md border bg-slate-900 px-3 py-3 ${borderBySeverity(severity)}`}>
-      <span className="text-xs text-slate-500">{label}:</span>
-      <span className={`font-mono font-bold ${severityText(severity)}`}>{value}</span>
+    <div className={`flex min-h-[40px] sm:min-h-11 min-w-0 sm:min-w-[120px] flex-1 items-center justify-between gap-1.5 sm:gap-2 rounded-md border bg-slate-900 px-2 py-2 sm:px-3 sm:py-3 ${borderBySeverity(severity)}`}>
+      <span className="text-[11px] sm:text-xs text-slate-500 shrink-0">{label}:</span>
+      <span className={`font-mono font-bold text-sm sm:text-base ${severityText(severity)}`}>{value}</span>
     </div>
   );
 }
@@ -868,12 +901,12 @@ function ReportViewer({
   const status = mode === "sentraq" && contained ? "Contained" : completed ? "Impact Reached" : "In Progress";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-800 px-5 py-3">
-          <div>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 p-0 sm:p-4 backdrop-blur-sm">
+      <div className="max-h-[100dvh] sm:max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-t-lg sm:rounded-lg border border-slate-700 bg-slate-950 shadow-2xl flex flex-col">
+        <div className="flex items-center justify-between border-b border-slate-800 px-3 py-2 sm:px-5 sm:py-3 shrink-0">
+          <div className="min-w-0">
             <div className="text-xs font-bold uppercase tracking-wider text-cyan-300">Incident report</div>
-            <h2 className="text-lg font-black text-white">{scenario.name}</h2>
+            <h2 className="text-base sm:text-lg font-black text-white truncate">{scenario.name}</h2>
           </div>
           <button
             onClick={onClose}
@@ -883,7 +916,7 @@ function ReportViewer({
           </button>
         </div>
 
-        <div className="max-h-[calc(92vh-74px)] overflow-y-auto p-3 sm:p-5">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5">
           <div className="rounded-md border border-slate-800 bg-white p-3 text-slate-950 sm:p-6">
             <div className="flex flex-col gap-3 border-b border-slate-300 pb-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
@@ -1019,8 +1052,8 @@ function ReportViewer({
 
             <section className="mt-6">
               <h3 className="border-b border-slate-300 pb-1 text-sm font-black uppercase tracking-wider">Attack Timeline</h3>
-              <div className="mt-2 rounded border border-slate-300">
-                <table className="w-full table-fixed text-left text-xs">
+              <div className="mt-2 rounded border border-slate-300 overflow-x-auto">
+                <table className="w-full min-w-[400px] table-fixed text-left text-xs">
                   <thead className="bg-slate-100 text-slate-600">
                     <tr>
                       <th className="break-words px-3 py-2 align-top">Time</th>
@@ -1096,8 +1129,8 @@ function ReportViewer({
 
 function VideoViewer({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3 backdrop-blur-sm sm:p-5">
-      <div className="w-full max-w-5xl overflow-hidden rounded-lg border border-emerald-500/30 bg-slate-950 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 p-0 sm:p-5 backdrop-blur-sm">
+      <div className="w-full max-w-5xl max-h-[100dvh] sm:max-h-none overflow-hidden rounded-t-lg sm:rounded-lg border border-emerald-500/30 bg-slate-950 shadow-2xl flex flex-col">
         <div className="flex items-center justify-between gap-3 border-b border-slate-800 px-4 py-3">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-emerald-300">With Sentraq</div>
@@ -1111,7 +1144,7 @@ function VideoViewer({ onClose }: { onClose: () => void }) {
           </button>
         </div>
         <div className="bg-black p-2 sm:p-4">
-          <video className="h-auto max-h-[76vh] w-full rounded-md bg-black" controls autoPlay>
+          <video className="h-auto max-h-[80dvh] sm:max-h-[76vh] w-full rounded-md bg-black" controls autoPlay playsInline>
             <source src="/my-dashboard.mp4" type="video/mp4" />
             <source src="/my-dashboard.mkv" type="video/x-matroska" />
             Your browser cannot play this video file.
@@ -1149,18 +1182,18 @@ function ReportField({ label, value }: { label: string; value: string }) {
 
 function CompactMetric({ label, value, danger }: { label: string; value: number; danger?: boolean }) {
   return (
-    <div className="rounded border border-slate-800 bg-black/30 px-1.5 py-1 text-center">
-      <div className={`text-sm font-bold font-mono ${danger ? "text-red-300" : "text-white"}`}>{value}</div>
-      <div className="text-[9px] text-slate-500 uppercase">{label}</div>
+    <div className="rounded border border-slate-800 bg-black/30 px-0.5 py-0.5 sm:px-1.5 sm:py-1 text-center">
+      <div className={`text-[10px] sm:text-sm font-bold font-mono ${danger ? "text-red-300" : "text-white"}`}>{value}</div>
+      <div className="text-[7px] sm:text-[9px] text-slate-500 uppercase">{label}</div>
     </div>
   );
 }
 
 function SeverityTile({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="rounded-md border border-slate-800 bg-slate-900 p-2 text-center">
-      <div className={`text-lg font-bold font-mono ${color}`}>{value}</div>
-      <div className="text-[10px] text-slate-500 uppercase">{label}</div>
+    <div className="rounded-md border border-slate-800 bg-slate-900 p-0.5 sm:p-1.5 lg:p-2 text-center">
+      <div className={`text-[10px] sm:text-base lg:text-lg font-bold font-mono ${color}`}>{value}</div>
+      <div className="text-[7px] sm:text-[9px] lg:text-[10px] text-slate-500 uppercase">{label}</div>
     </div>
   );
 }
@@ -1346,7 +1379,7 @@ function Topology({ scenario, progress, contained }: { scenario: AttackScenario;
           className="absolute -translate-x-1/2 -translate-y-1/2"
           style={{ left: `${node.x}%`, top: `${node.y}%` }}
         >
-          <div className={`w-24 rounded border px-1.5 py-1 shadow-xl backdrop-blur ${contained && node.status !== "noisy" ? "bg-emerald-950/40 border-emerald-500/50" : nodeStyle(node.status)}`}>
+          <div className={`topology-node-card w-24 rounded border px-1.5 py-1 shadow-xl backdrop-blur ${contained && node.status !== "noisy" ? "bg-emerald-950/40 border-emerald-500/50" : nodeStyle(node.status)}`}>
             <div className="flex items-center gap-1">
               <span className={`h-2 w-2 rounded-sm ${contained && node.status !== "noisy" ? "bg-emerald-400" : nodeDot(node.status)}`} />
               <span className="text-[10px] font-bold text-white truncate">{node.label}</span>

@@ -10,10 +10,16 @@ body,
   width: 100%;
 }
 
+html {
+  /* Support safe area insets for notched devices */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
 body {
   margin: 0;
   overflow-x: hidden;
   overflow-wrap: anywhere;
+  -webkit-text-size-adjust: 100%;
 }
 
 #root {
@@ -26,86 +32,29 @@ svg {
   height: auto;
 }
 
-@media (max-width: 768px) {
-  .dashboard-shell {
-    display: flex !important;
-    flex-direction: column !important;
-  }
+/* Smooth scrolling for scroll containers on iOS */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}
 
-  .dashboard-shell > aside,
-  .dashboard-shell > main {
-    display: contents !important;
-  }
+/* Improve tap responsiveness on mobile */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
 
-  .dashboard-shell .execution-status,
-  .dashboard-shell .live-siem-alerts,
-  .dashboard-shell .l1-focus,
-  .dashboard-shell .attack-simulations,
-  .dashboard-shell .network-topology,
-  .dashboard-shell .soc-workstation,
-  .dashboard-shell .sentraq-workflow,
-  .dashboard-shell .case-notes {
-    width: 100%;
-    margin-bottom: 12px;
-  }
+/* Prevent text selection on interactive elements */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
 
-  .dashboard-shell .execution-status {
-    order: 1;
-  }
-
-  .dashboard-shell .live-siem-alerts {
-    order: 2;
-    min-height: 200px;
-  }
-
-  .dashboard-shell .l1-focus {
-    order: 3;
-  }
-
-  .dashboard-shell .attack-simulations {
-    order: 4;
-  }
-
-  .dashboard-shell .network-topology {
-    order: 5;
-  }
-
-  .dashboard-shell .soc-workstation {
-    order: 6;
-  }
-
-  .dashboard-shell .sentraq-workflow {
-    order: 7;
-  }
-
-  .dashboard-shell .case-notes {
-    order: 8;
-  }
-
+@media (max-width: 639px) {
+  /* Mobile: hide the SIEM alerts grid header since AlertRow has its own compact layout */
   .dashboard-shell .alerts-header {
-    grid-template-columns: minmax(64px, 1fr) repeat(3, minmax(0, 1fr));
-    font-size: 12px;
-  }
-
-  .dashboard-shell .alert-row {
-    min-height: 36px;
-    font-size: 12px;
-    grid-template-columns: minmax(64px, 1fr) repeat(3, minmax(0, 1fr));
-  }
-
-  .dashboard-shell .alert-row .col-sig,
-  .dashboard-shell .alert-row .col-sev {
     display: none;
   }
 
-  .dashboard-shell .alert-row .col-time,
-  .dashboard-shell .alert-row .col-rule,
-  .dashboard-shell .alert-row .col-source,
-  .dashboard-shell .alert-row .col-target {
-    min-width: 0;
-    word-break: break-word;
-  }
-
+  /* Mobile: ensure attack action buttons are full width with proper touch targets */
   .dashboard-shell .attack-simulations .attack-actions {
     width: 100%;
   }
@@ -115,17 +64,31 @@ svg {
     min-height: 44px;
   }
 
+  /* Mobile: topology scroll hint visible */
   .dashboard-shell .network-topology .topology-hint {
     display: block;
   }
 
+  /* Mobile: topology horizontal scroll */
   .dashboard-shell .network-topology .topology-scroll {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
   }
 
   .dashboard-shell .network-topology .topology-map {
-    width: max-content;
-    min-width: 100%;
+    min-width: 540px;
+  }
+
+  /* Mobile: topology nodes smaller */
+  .dashboard-shell .topology-node-card {
+    width: 5rem; /* 80px instead of 96px */
+  }
+}
+
+@media (min-width: 640px) {
+  /* Desktop: topology hint hidden */
+  .dashboard-shell .network-topology .topology-hint {
+    display: none;
   }
 }
